@@ -1,0 +1,68 @@
+name: Role Credits Windows Desktop Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'main.go'
+      - 'main_test.go'
+      - 'go.mod'
+      - 'Role_Credits_Studio_Standalone.html'
+      - '.github/workflows/desktop-release.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  windows-release:
+    runs-on: windows-latest
+    steps:
+      - name: Check out Role Credits
+        uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Test the Windows launcher and updater
+        shell: pwsh
+        run: |
+          go test ./...
+          if ($LASTEXITCODE -ne 0) { throw 'Desktop tests failed. No release was published.' }
+
+      - name: Compile installer, version, and checksum
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $source = Get-Content main.go -Raw
+          if ($source -notmatch 'appVersion\s*=\s*"(\d+\.\d+\.\d+(?:\.\d+)?)"') {
+            throw 'Cannot read version from main.go; no release published.'
+          }
+          $version = $Matches[1]
+          "RC_VERSION=$version" >> $env:GITHUB_ENV
+          $env:CGO_ENABLED = '0'
+          go build -trimpath -ldflags='-s -w -H windowsgui' -o Role_Credits_Setup.exe .
+          if ($LASTEXITCODE -ne 0) { throw 'Windows installer compilation failed.' }
+          $digest = (Get-FileHash 'Role_Credits_Setup.exe' -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$digest  Role_Credits_Setup.exe" | Set-Content 'Role_Credits_Setup.sha256' -Encoding ascii
+          Copy-Item 'Role_Credits_Setup.exe' 'Role_Credits.exe'
+
+      - name: Publish versioned GitHub prerelease with installer and checksum
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tag = "v$env:RC_VERSION"
+          $releaseJSON = gh release list --repo "$env:GITHUB_REPOSITORY" --limit 100 --json tagName
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot check existing releases.' }
+          $tags = @($releaseJSON | ConvertFrom-Json | ForEach-Object { $_.tagName })
+          if ($tags -contains $tag) {
+            Write-Host "Release $tag already exists; not republishing changed files under the same version."
+            exit 0
+          }
+          gh release create $tag 'Role_Credits_Setup.exe' 'Role_Credits_Setup.sha256' 'Role_Credits.exe' --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --prerelease --generate-notes --title "Role Credits Desktop $tag"
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub release publication failed.' }
