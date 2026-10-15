@@ -1,0 +1,50 @@
+name: Role Credits Windows Desktop Release
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/desktop-release.yml'
+permissions:
+  contents: write
+jobs:
+  windows-desktop:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: desktop/go.mod
+      - name: Verify and test desktop updater
+        working-directory: desktop
+        shell: pwsh
+        run: go test ./...
+      - name: Build installer
+        working-directory: desktop
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $source = Get-Content main.go -Raw
+          if ($source -notmatch 'appVersion = "(\d+\.\d+\.\d+(?:\.\d+)?)"') { throw 'appVersion missing' }
+          $v = $Matches[1]
+          "VERSION=$v" | Out-File -Append -FilePath $env:GITHUB_ENV -Encoding utf8
+          $env:CGO_ENABLED = '0'
+          go build -trimpath -ldflags='-s -w -H windowsgui' -o '../Role_Credits_Setup.exe' .
+          $hash = (Get-FileHash '../Role_Credits_Setup.exe' -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  Role_Credits_Setup.exe" | Set-Content '../Role_Credits_Setup.sha256' -Encoding ascii
+          Copy-Item '../Role_Credits_Setup.exe' '../Role_Credits.exe'
+      - name: Ensure this is a new release version
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          gh release view "v$env:VERSION" --repo "$env:GITHUB_REPOSITORY" *> $null
+          if ($LASTEXITCODE -eq 0) { throw "Release v$env:VERSION already exists. Bump the version before changing desktop bytes." }
+      - name: Publish GitHub prerelease for installed updaters
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          gh release create "v$env:VERSION" 'Role_Credits_Setup.exe' 'Role_Credits_Setup.sha256' 'Role_Credits.exe' --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --prerelease --generate-notes --title "Role Credits Desktop v$env:VERSION"
