@@ -26,6 +26,9 @@ import (
 //go:embed Role_Credits_Studio_Standalone.html
 var appHTML embed.FS
 
+//go:embed Role_Credits.ico
+var applicationIcon []byte
+
 const (
 	appName        = "Role Credits Studio"
 	releaseAPI     = "https://api.github.com/repos/deathboundchronicles-dev/Role-Credits-/releases?per_page=30"
@@ -35,7 +38,7 @@ const (
 	port = "38471"
 )
 
-var appVersion = "0.2.2.0" // overridden by -ldflags for releases
+var appVersion = "0.2.2.2" // overridden by -ldflags for releases
 
 var httpClient = &http.Client{Timeout: 30 * time.Second, CheckRedirect: func(r *http.Request, via []*http.Request) error {
 	if len(via) > 8 || r.URL.Scheme != "https" {
@@ -254,16 +257,35 @@ func appInstallDir() string {
 	return filepath.Join(root, "Programs", "Role Credits Studio")
 }
 func installLocation() string { return filepath.Join(appInstallDir(), "Role_Credits.exe") }
-func setupShortcut() {
+
+// setupShortcuts creates both the Start Menu and the actual user Desktop shortcut,
+// including when an update repairs shortcuts that were deleted or never installed.
+const desktopShortcutScript = `$ErrorActionPreference='Stop';
+      $wsh=New-Object -ComObject WScript.Shell;
+      $start=Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs';
+      $desktop=$wsh.SpecialFolders.Item('Desktop');
+      if ([string]::IsNullOrWhiteSpace($desktop)) { $desktop=[Environment]::GetFolderPath('Desktop') };
+      if ([string]::IsNullOrWhiteSpace($desktop)) { throw 'Windows did not supply a Desktop directory.' };
+      foreach ($folder in @($start,$desktop)) {
+        New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop | Out-Null;
+        $shortcut=$wsh.CreateShortcut((Join-Path $folder 'Role Credits Studio.lnk'));
+        $shortcut.TargetPath=$env:RC_INSTALL_TARGET;
+        $shortcut.WorkingDirectory=Split-Path -Parent $env:RC_INSTALL_TARGET;
+        $shortcut.IconLocation=$env:RC_INSTALL_ICON;
+        $shortcut.Description='Role Credits Studio - A Saturday Morning TV TTRPG';
+        $shortcut.Save();
+      }`
+
+func setupShortcuts() error {
 	if runtime.GOOS != "windows" {
-		return
+		return nil
 	}
-	const script = `$sh=New-Object -ComObject WScript.Shell; $start=Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'; New-Item -Force -ItemType Directory -Path $start | Out-Null; $s=$sh.CreateShortcut((Join-Path $start 'Role Credits Studio.lnk')); $s.TargetPath=$env:RC_INSTALL_TARGET; $s.WorkingDirectory=Split-Path $env:RC_INSTALL_TARGET; $s.Save()`
-	cmd := exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script)
-	cmd.Env = append(os.Environ(), "RC_INSTALL_TARGET="+installLocation())
-	if data, e := cmd.CombinedOutput(); e != nil {
-		log.Printf("Start Menu shortcut: %v: %s", e, strings.TrimSpace(string(data)))
+	cmd := exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", desktopShortcutScript)
+	cmd.Env = append(os.Environ(), "RC_INSTALL_TARGET="+installLocation(), "RC_INSTALL_ICON="+filepath.Join(appInstallDir(), "Role_Credits.ico")+",0")
+	if data, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("could not create branded Desktop and Start Menu shortcuts: %w: %s", err, strings.TrimSpace(string(data)))
 	}
+	return nil
 }
 func doInstall(relaunch bool) error {
 	exe, e := os.Executable()
@@ -306,7 +328,14 @@ func doInstall(relaunch bool) error {
 	if swapErr != nil {
 		return fmt.Errorf("could not replace launcher (another process may still be running): %w", swapErr)
 	}
-	setupShortcut()
+	// The dedicated icon file survives executable replacement and gives Windows shortcuts
+	// a stable branded icon, even while Explorer is refreshing the executable icon cache.
+	if e = os.WriteFile(filepath.Join(appInstallDir(), "Role_Credits.ico"), applicationIcon, 0644); e != nil {
+		return fmt.Errorf("installing Role Credits icon: %w", e)
+	}
+	if e = setupShortcuts(); e != nil {
+		return e
+	}
 	if relaunch {
 		return exec.Command(dest).Start()
 	}
@@ -328,6 +357,8 @@ func htmlWithUpdater() (string, error) {
 		return "", e
 	}
 	s := string(b)
+	// The browser window uses the same icon as the Windows shortcut.
+	s = strings.Replace(s, "</head>", `<link rel="icon" type="image/x-icon" href="/favicon.ico"></head>`, 1)
 	injection := `<style id="rc-windows-updater-style">#rc-win-updater{position:fixed;z-index:2147483640;bottom:12px;left:12px;background:#082f55;color:white;border:2px solid #f6c83f;border-radius:12px;padding:8px 11px;font:12px Arial,sans-serif;box-shadow:0 7px 20px #112c4b55;max-width:min(340px,90vw)}#rc-win-updater button{width:auto;background:#f6c83f;color:#082f55;border:0;border-radius:6px;padding:5px 10px;margin-left:8px;font-weight:bold;cursor:pointer}#rc-win-updater small{display:block;margin-top:5px;color:#fff3ba}</style><div id="rc-win-updater"><span id="rc-update-label">Desktop v` + appVersion + `</span><button id="rc-update-button">Check for Updates</button><small id="rc-update-status" aria-live="polite"></small></div><script id="rc-win-updater-script">(function(){let b=document.getElementById('rc-update-button'),l=document.getElementById('rc-update-label'),s=document.getElementById('rc-update-status');async function check(force){try{s.textContent='Checking GitHub Releases...';let r=await fetch('/__rc_update?mode=check'+(force?'&force=1':''));let j=await r.json();if(j.status==='available'){l.textContent='Update available: '+j.version;b.textContent='Install Update';b.onclick=install;s.textContent='Your campaigns stay in this browser.'}else if(j.status==='current'){s.textContent='You have the latest published desktop version.'}else{s.textContent='Update check unavailable: '+(j.message||j.status)}}catch(e){s.textContent='Offline or unable to check updates.'}}async function install(){if(!confirm('Download and install the verified Role Credits update? Save any unsaved character edits first.'))return;b.disabled=true;s.textContent='Downloading and verifying installer...';try{let r=await fetch('/__rc_update?mode=install',{method:'POST'});let j=await r.json();s.textContent=j.message||j.status;if(j.status!=='launching')b.disabled=false}catch(e){s.textContent='Update failed: '+e.message;b.disabled=false}}b.onclick=()=>check(true);setTimeout(()=>check(false),1600)})();</script>`
 	if strings.Contains(strings.ToLower(s), "</body>") {
 		i := strings.LastIndex(strings.ToLower(s), "</body>")
@@ -346,6 +377,11 @@ func serve() error {
 		return e
 	}
 	mux := http.NewServeMux()
+	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "image/x-icon")
+		w.Header().Set("Cache-Control", "public, max-age=86400")
+		_, _ = w.Write(applicationIcon)
+	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
