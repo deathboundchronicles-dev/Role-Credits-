@@ -1,50 +1,86 @@
 name: Role Credits Windows Desktop Release
+
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
-      - 'desktop/**'
+      - 'main.go'
+      - 'main_test.go'
+      - 'go.mod'
+      - 'Role_Credits_Studio_Standalone.html'
+      - 'Role_Credits.ico'
+      - 'embed_windows_icon.py'
       - '.github/workflows/desktop-release.yml'
+
 permissions:
   contents: write
+
 jobs:
-  windows-desktop:
+  windows-release:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Check out Role Credits
+        uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v5
         with:
-          go-version-file: desktop/go.mod
-      - name: Verify and test desktop updater
-        working-directory: desktop
+          go-version-file: go.mod
+
+      - name: Install Python for Windows icon embedding
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Test the Windows launcher and updater
         shell: pwsh
-        run: go test ./...
-      - name: Build installer
-        working-directory: desktop
+        run: |
+          go test ./...
+          if ($LASTEXITCODE -ne 0) { throw 'Desktop tests failed. No release was published.' }
+
+      - name: Compile branded Windows installer and checksum
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $source = Get-Content main.go -Raw
-          if ($source -notmatch 'appVersion = "(\d+\.\d+\.\d+(?:\.\d+)?)"') { throw 'appVersion missing' }
-          $v = $Matches[1]
-          "VERSION=$v" | Out-File -Append -FilePath $env:GITHUB_ENV -Encoding utf8
+          if ($source -notmatch 'appVersion\s*=\s*"(\d+\.\d+\.\d+(?:\.\d+)?)"') {
+            throw 'Cannot read version from main.go; no release published.'
+          }
+          $version = $Matches[1]
+          "RC_VERSION=$version" >> $env:GITHUB_ENV
+          if (-not (Test-Path 'Role_Credits.ico')) { throw 'Approved desktop icon missing from repository.' }
+          if (-not (Test-Path 'embed_windows_icon.py')) { throw 'Icon embedding script missing from repository.' }
+          $iconDigest = (Get-FileHash 'Role_Credits.ico' -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($iconDigest -ne 'c0e839cbab26c528d0efdc11954d3c7d08b52f464441bf137dd52dc93ab92e62') { throw 'Role_Credits.ico does not match the approved icon. Update the pin only if rebranding is intentional.' }
           $env:CGO_ENABLED = '0'
-          go build -trimpath -ldflags='-s -w -H windowsgui' -o '../Role_Credits_Setup.exe' .
-          $hash = (Get-FileHash '../Role_Credits_Setup.exe' -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$hash  Role_Credits_Setup.exe" | Set-Content '../Role_Credits_Setup.sha256' -Encoding ascii
-          Copy-Item '../Role_Credits_Setup.exe' '../Role_Credits.exe'
-      - name: Ensure this is a new release version
+          go build -trimpath -ldflags='-s -w -H windowsgui' -o Role_Credits_Setup.exe .
+          if ($LASTEXITCODE -ne 0) { throw 'Windows installer compilation failed.' }
+          # Adds RT_ICON and RT_GROUP_ICON, and validates Windows resource directory.
+          python embed_windows_icon.py Role_Credits_Setup.exe Role_Credits.ico
+          if ($LASTEXITCODE -ne 0) { throw 'Windows executable icon embedding failed.' }
+          $digest = (Get-FileHash 'Role_Credits_Setup.exe' -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$digest  Role_Credits_Setup.exe" | Set-Content 'Role_Credits_Setup.sha256' -Encoding ascii
+          Copy-Item 'Role_Credits_Setup.exe' 'Role_Credits.exe'
+          # Both published binaries must contain the same branded resource.
+          if ((Get-FileHash 'Role_Credits.exe' -Algorithm SHA256).Hash -ne (Get-FileHash 'Role_Credits_Setup.exe' -Algorithm SHA256).Hash) {
+            throw 'Branded installer and app executable differ.'
+          }
+
+      - name: Publish versioned GitHub prerelease with branded installer and checksum
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference = 'Stop'
-          gh release view "v$env:VERSION" --repo "$env:GITHUB_REPOSITORY" *> $null
-          if ($LASTEXITCODE -eq 0) { throw "Release v$env:VERSION already exists. Bump the version before changing desktop bytes." }
-      - name: Publish GitHub prerelease for installed updaters
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          $ErrorActionPreference = 'Stop'
-          gh release create "v$env:VERSION" 'Role_Credits_Setup.exe' 'Role_Credits_Setup.sha256' 'Role_Credits.exe' --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --prerelease --generate-notes --title "Role Credits Desktop v$env:VERSION"
+          $tag = "v$env:RC_VERSION"
+          $releaseJSON = gh release list --repo "$env:GITHUB_REPOSITORY" --limit 100 --json tagName
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot check existing releases.' }
+          $tags = @($releaseJSON | ConvertFrom-Json | ForEach-Object { $_.tagName })
+          if ($tags -contains $tag) {
+            Write-Host "Release $tag already exists; not republishing changed files under the same version."
+            exit 0
+          }
+          gh release create $tag 'Role_Credits_Setup.exe' 'Role_Credits_Setup.sha256' 'Role_Credits.exe' --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --prerelease --generate-notes --title "Role Credits Desktop $tag"
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub release publication failed.' }
