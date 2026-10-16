@@ -38,7 +38,7 @@ const (
 	port = "38471"
 )
 
-var appVersion = "0.2.2.2" // overridden by -ldflags for releases
+var appVersion = "0.2.2.6" // overridden by -ldflags for releases
 
 var httpClient = &http.Client{Timeout: 30 * time.Second, CheckRedirect: func(r *http.Request, via []*http.Request) error {
 	if len(via) > 8 || r.URL.Scheme != "https" {
@@ -287,6 +287,31 @@ func setupShortcuts() error {
 	}
 	return nil
 }
+
+// Stop only this product's already-installed executable. Otherwise a prior
+// process keeps serving the old embedded character sheet at the fixed localhost
+// port, even after the new files have been successfully installed.
+func stopPreviousDesktopServer(target string) error {
+	if runtime.GOOS != "windows" {
+		return nil
+	}
+	script := `$ErrorActionPreference='Stop';
+$installed=$env:RC_INSTALL_TARGET;
+Get-CimInstance Win32_Process -Filter "Name = 'Role_Credits.exe'" -ErrorAction Stop | ForEach-Object {
+  if ($_.ExecutablePath -and [string]::Equals($_.ExecutablePath,$installed,[StringComparison]::OrdinalIgnoreCase)) {
+    Stop-Process -Id $_.ProcessId -Force -ErrorAction Stop
+  }
+}`
+	cmd := exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script)
+	cmd.Env = append(os.Environ(), "RC_INSTALL_TARGET="+target)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("could not stop the previous Role Credits instance: %w: %s", err, strings.TrimSpace(string(output)))
+	}
+	time.Sleep(300 * time.Millisecond)
+	return nil
+}
+
 func doInstall(relaunch bool) error {
 	exe, e := os.Executable()
 	if e != nil {
@@ -297,6 +322,11 @@ func doInstall(relaunch bool) error {
 		return e
 	}
 	dest := installLocation()
+	// Installer upgrades take over the app's fixed local port from older copies.
+	// Closing the prior installed binary first prevents opening a stale sheet.
+	if e = stopPreviousDesktopServer(dest); e != nil {
+		return e
+	}
 	if e = os.MkdirAll(filepath.Dir(dest), 0755); e != nil {
 		return e
 	}
