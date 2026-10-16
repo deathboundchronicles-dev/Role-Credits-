@@ -2325,6 +2325,58 @@
       @media(max-width:900px){.rc-tag-controls{grid-template-columns:1fr 1fr}.rc-tag-results{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}}
       @media(max-width:600px){.rc-tag-controls{grid-template-columns:1fr}.rc-tag-results{grid-template-columns:1fr}.rc-tag-desk{margin-left:8px!important;margin-right:8px!important}}
 
+
+/* RC v0.2.2.5: responsive sheet card layout, no hidden die or Growth controls. */
+#character .abilities-section .ability-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding:6px 0 10px; align-items:start; }
+#character .abilities-section .paper-ability-group { min-width:0; overflow:visible; }
+#character .abilities-section .paper-ability-group .ability-head { display:none; }
+#character .abilities-section .paper-ability-group .ability { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 10px; align-items:start; padding:9px 10px 11px; min-width:0; overflow:visible; }
+#character .abilities-section .paper-ability-group .ability>b { grid-column:1/-1; font-size:.9rem; }
+#character .abilities-section .paper-ability-group .ability>.die-ladder { display:flex; flex-wrap:wrap; align-content:flex-start; gap:5px; min-width:0; padding:0; }
+#character .abilities-section .paper-ability-group .ability>.dots { grid-column:1; flex-wrap:wrap; align-content:flex-start; gap:6px; min-width:0; }
+#character .abilities-section .paper-ability-group .ability>.growth { grid-column:2; flex-wrap:wrap; align-content:flex-start; gap:6px; min-width:0; }
+#character .abilities-section .paper-ability-group .ability>.roll { grid-column:1/-1; min-height:38px; width:100%; font-size:.85rem; }
+#character .abilities-section .ability-field-label { flex-basis:100%; width:100%; font-size:.66rem; letter-spacing:.035em; font-weight:1000; line-height:1.35; color:#245070; }
+#character .abilities-section .die-step { flex:0 0 auto; min-width:33px; min-height:32px; border-radius:5px; }
+#character .abilities-section .die-step.current { background:#2aaad6; color:#fff; border-color:#06678d; outline:2px solid #d6f8ff; outline-offset:0; }
+#character .abilities-section .paper-ability-group .growth button,#character .abilities-section .paper-ability-group .dots button { flex:0 0 auto; width:24px; height:24px; min-height:24px; border-radius:5px; }
+#character .abilities-section .paper-ability-group .growth button.on { background:#f7cc47; border-color:#b88c05; }
+#character .abilities-section .ability-meta-note,#character .abilities-section .ability-click-help { font-size:.68rem; line-height:1.45; }
+#character .abilities-section .die-reset { flex-basis:100%; width:fit-content; min-height:27px; padding:4px 8px; font-size:.63rem; font-weight:900; border:1px solid #bacbd6; border-radius:6px; color:#295574; background:#f1f8fb; }
+#character .abilities-section .section-title-row { flex-wrap:wrap; }
+#character .abilities-section .section-title-row small { line-height:1.4; }
+@media (max-width:900px) { #character .abilities-section .ability-grid { grid-template-columns:1fr; } }
+@media (max-width:430px) { #character .abilities-section .paper-ability-group .ability { grid-template-columns:1fr; } #character .abilities-section .paper-ability-group .ability>.growth,#character .abilities-section .paper-ability-group .ability>.dots { grid-column:1/-1; } }
+
+      #rollModal{padding:8px;}#rollModal .dialog{max-height:calc(100dvh - 16px);overflow-y:auto;overscroll-behavior:contain;min-width:0;}
+      /* Automatic criticals: clearly separate the unresolved base roll from the final result. */
+      .roll-rules-help{font-size:.82rem;line-height:1.45;color:#335b75;margin:8px 0 12px;}
+      .die-ladder .die-step.below-permanent {position:relative;opacity:.56;filter:grayscale(1);color:#5b6773;background:#e8eaed;border-color:#9aa5ac;cursor:not-allowed;text-decoration:line-through;text-decoration-thickness:2px;}
+      .die-ladder .die-step.below-permanent::after{content:'✕';position:absolute;top:-6px;right:1px;font-size:15px;color:#c22b30;font-weight:1000;line-height:1;transform:rotate(-9deg);text-shadow:0 1px white;}
+      .roll-boost-preview{background:#ecfaff;border:2px solid #36a9ca;border-radius:9px;padding:10px;margin:8px 0;}
+      .roll-boost-preview .roll-chain{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0;}
+
+      .roll-base-card{background:#f1f7fb;border:1px solid #bed6e4;border-radius:12px;padding:13px;margin-top:12px;line-height:1.55;}
+      .roll-base-card .roll-dice-strip{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
+      .roll-dice-chip{background:#fff;border:2px solid #92b6cc;border-radius:7px;padding:6px 9px;font-weight:900;color:#154260;display:inline-flex;gap:4px;align-items:baseline;}
+      .roll-dice-chip.kept{border-color:#e5af25;background:#fff3c4;box-shadow:0 0 0 1px #fbd96c;}
+      .roll-finalize-pane{background:#fffaf0;border:1px solid #e5c570;border-radius:11px;padding:11px;display:grid;gap:9px;margin-top:12px;}
+      .roll-finalize-pane label{font-weight:850;font-size:.82rem;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+      .roll-finalize-pane input[type=number]{width:96px;min-width:96px;}
+      .roll-finalize-pane input[type=checkbox]{width:18px;height:18px;min-height:18px;flex:none;}
+      .roll-finalize-pane .btn{min-height:40px;white-space:normal;}
+      .roll-chain{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0;}
+      .roll-chain .roll-dice-chip{border-color:#29a4bd;background:#e0faff;}
+      .roll-final-result{padding:13px;border-radius:12px;background:#e8f7ee;border:1px solid #76c49a;color:#11452f;margin:8px 0;line-height:1.55;}
+      .roll-final-result.fail{background:#fff0ee;border-color:#d9a5a0;color:#772b30;}
+      .roll-final-result strong{display:inline-block;font-size:1.8rem;}
+      .roll-crit-label{display:inline-block;background:#f8d44f;border:1px solid #bd9025;color:#49380f;padding:4px 9px;border-radius:8px;font-weight:950;}
+      .roll-delta-note{font-size:.8rem;font-weight:800;color:#425c70;}
+      .roll-result-breakdown{font-size:.82rem;line-height:1.6;overflow-wrap:anywhere;}
+      @media(max-width:540px){.roll-finalize-pane{padding:8px}.roll-finalize-pane label{align-items:flex-start}.roll-finalize-pane input[type=number]{width:76px;min-width:76px}}
+
+      .rc-tag-primer{margin:10px 14px;padding:13px 15px;background:#fff5d7;border:2px solid #d8ae43;border-radius:12px;color:#3d351a;font-size:.87rem;line-height:1.4}.rc-tag-primer p{margin:6px 0 0}.rc-tag-primer b{color:#193d62}
+      .rc-tag-roll-panel{border:2px solid #ddbb56;border-radius:12px;background:#fff8e5;padding:12px;display:grid;gap:8px;margin:10px 0;color:#263f56}.rc-tag-roll-panel legend{font-size:.82rem;font-weight:950;color:#173f63;padding:0 6px}.rc-tag-roll-panel p{margin:0;font-size:.82rem;line-height:1.4}.rc-tag-roll-panel label{margin:0;font-size:.78rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap}.rc-tag-roll-panel input[type=checkbox]{width:auto;min-height:0}.rc-tag-roll-panel small{font-size:.72rem}.rc-tag-roll-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.rc-tag-roll-grid label{display:block}.rc-tag-roll-grid input{width:100%;min-width:0}.rc-tag-roll-grid .rc-tag-reason{grid-column:1/-1}@media(max-width:540px){.rc-tag-roll-grid{grid-template-columns:1fr}}
 </style>
   </head>
   <body>
@@ -2390,7 +2442,7 @@
 
             <div class="play-sheet-top">
               <section class="paper-section identity-section">
-                <h3>IDENTITY / CAST</h3>
+                <h3>IDENTITY / CAST</h3><p class="inline-note"><b>Tag interaction:</b> name how your Character, Technique, Equipment, or Team Tag affects another Tag to gain Edge. A successful damaging hit gains +1 damage. One interaction per roll.</p>
                 <div class="identity-layout">
                   <button id="characterPortrait" class="characterPortrait" onclick="openTokenMaker('character')">ADD PORTRAIT</button>
                   <div class="paper-field-grid">
@@ -2421,7 +2473,7 @@
             </div>
 
             <section class="paper-section abilities-section">
-              <div class="section-title-row"><h3>ABILITIES</h3><small><b>Permanent Die</b> = owned denomination · <b>Current Die</b> = temporary in-play markable die · <b>Growth</b> = separate 3-box in-play pool</small></div>
+              <div class="section-title-row"><h3>ABILITIES</h3><small><b>Current Die</b>: click a die to mark the one being rolled · <b>Growth</b>: click a yellow box (0–3) · <b>Permanent Die</b>: changes through Growth. <b>Roll engine v0.2.2.5</b></small></div>
               <div class="ability-grid" id="abilities"></div>
             </section>
 
@@ -2761,7 +2813,7 @@
             <div class="rules-index-summary"><b id="ruleCount">0 rules</b><span>Player-facing Alpha v0.2.2 reference · Storyteller-only tuning omitted</span></div>
           </div>
           <div class="rule-category-bar" id="ruleCategoryBar" aria-label="Rules categories"></div>
-          <div class="rc-tag-desk panel" id="rc-tag-dictionary"><div class="head">TAG DICTIONARY · CUSTOM TAGS</div><p class="inline-note" style="padding:12px 16px 0">Tags express what something is, how it works, and what can affect it. They never award automatic mechanical benefits. Click a tag to add it to a creation draft, or save your own for future use.</p><div class="rc-tag-controls"><label>Find a Tag<input id="rc-tag-search" placeholder="Search 200+ printed tags" oninput="renderTagDesk()"></label><label>Apply selected Tag to<select id="rc-tag-target" onchange="renderTagDesk()"><option value="character">Character creation</option><option value="technique">Technique design</option><option value="equipment">Equipment design</option><option value="asset">Team Asset design</option></select></label><label>New custom Tag<input id="rc-new-custom-tag" placeholder="e.g. Famous at Midnight"></label><button type="button" class="btn yellow" onclick="saveNewCustomTag()">Save Custom Tag</button></div><div id="rc-custom-tags" class="rc-tag-chip-wrap" style="padding:0 16px 12px"></div><div id="rc-tag-results" class="rc-tag-results"></div></div>
+          <div class="rc-tag-desk panel" id="rc-tag-dictionary"><div class="head">TAG DICTIONARY · CUSTOM TAGS</div><p class="inline-note" style="padding:12px 16px 0">Tags describe what something is or does, and create mechanical leverage. Explain how your Tag affects a target Tag to earn Edge; a successful damaging interaction adds +1 damage. Techniques require exactly 3 distinct one-word Tags. Click to add a suggested Tag or save your own.</p><div class="rc-tag-controls"><label>Find a Tag<input id="rc-tag-search" placeholder="Search 200+ printed tags" oninput="renderTagDesk()"></label><label>Apply selected Tag to<select id="rc-tag-target" onchange="renderTagDesk()"><option value="character">Character creation</option><option value="technique">Technique design</option><option value="equipment">Equipment design</option><option value="asset">Team Asset design</option><option value="threat">Threat design</option></select></label><label>New custom Tag<input id="rc-new-custom-tag" placeholder="e.g. Famous at Midnight"></label><button type="button" class="btn yellow" onclick="saveNewCustomTag()">Save Custom Tag</button></div><div id="rc-custom-tags" class="rc-tag-chip-wrap" style="padding:0 16px 12px"></div><div id="rc-tag-results" class="rc-tag-results"></div></div>
           <div class="rules" id="ruleList"></div>
         </div>
       </div>
@@ -2795,15 +2847,27 @@
           /></label>
         </div>
         <div id="rollEdgeSources" class="roll-edge-sources" hidden></div>
+        <fieldset class="rc-tag-roll-panel"><legend>✦ TAG INTERACTION · EARN EDGE</legend>
+          <p>Example: <b>Fire</b> against <b>Ice</b> melts the target. Declare how your Tags interact before the roll to gain Edge. If this deals damage, add +1 to the damage after a successful hit.</p>
+          <label><input type="checkbox" id="rcTagApply" aria-label="Apply justified Tag interaction"> Apply a justified Tag interaction</label>
+          <div class="rc-tag-roll-grid">
+            <label>Your Tag<input id="rcTagSource" list="rcRollTagOptions" placeholder="Fire" autocomplete="off"></label>
+            <label>Target Tag<input id="rcTagTarget" list="rcRollTagOptions" placeholder="Ice" autocomplete="off"></label>
+            <label class="rc-tag-reason">How does it affect the target?<input id="rcTagReason" placeholder="Fire melts Ice, exposing its weakness" autocomplete="off"></label>
+          </div><datalist id="rcRollTagOptions"></datalist>
+          <label><input type="checkbox" id="rcTagDamage" checked> This action deals damage on success (+1 damage, not +1 to the check)</label>
+          <small>Applies to Characters, Techniques, Equipment, Assets, Threats and Scene Features. Only one Tag-interaction Edge source per check. Normal Edge/Negative Edge cancellation applies.</small>
+        </fieldset>
         <div class="edge">
           <button class="on" data-edge="normal">Normal</button
           ><button data-edge="edge">Edge</button
           ><button data-edge="negative">Negative Edge</button>
         </div>
-        <button class="btn" style="width: 100%" onclick="makeRoll()">
-          ROLL
+        <button class="btn" id="rollStartButton" style="width: 100%" onclick="makeRoll()">
+          ROLL ABILITY DIE
         </button>
-        <div id="rollResult"></div>
+        <p class="roll-rules-help"><b>TAG INTERACTIONS:</b> Explain how your Tag affects another to claim one source of Edge, plus +1 damage on a successful damaging hit (Fire vs Ice). This works with Character, Technique, Equipment, Asset, Threat and Scene Tags. <b>CRITICALS:</b> After rolling, spend Character Tokens if you wish, then <b>Finalize</b>. Natural maximums always explode into the next die before success is checked, even if the base roll would fail. Every natural maximum chains, with every bonus added to the result. Qualifying maximums advance the temporary Current Die and Growth without requiring success. Current Die options below the permanent minimum are crossed out.</p>
+        <div id="rollResult" aria-live="polite"></div>
       </div>
     </div>
     <div class="modal" id="tokenMakerModal">
@@ -2981,8 +3045,8 @@
           {
                     "category": "Checks",
                     "title": "Critical Boost & Growth",
-                    "summary": "If the kept Ability Die naturally rolls its maximum and the check succeeds, roll the next die on the ladder and add it. Maximums can chain; once d20 is reached, further boost dice stay d20.",
-                    "details": "A meaningful natural Critical Boost marks 1 Growth box for that Ability, maximum 1 box per check. At 3/3 Growth, step the Ability Die up one rung, then clear the boxes. d20 normally cannot grow further. After a Critical Boost, you may also immediately spend 5 Character Tokens to lock that exact action in as a Signature Move by recording its action, die-pool assignment, flavor, and relevant circumstances. Ability Signatures require the Ability used to have at least 2 Dots; Technique Signatures require the Technique used to be Rank 2 or higher."
+                    "summary": "If the kept Ability Die naturally rolls its maximum, roll the next die and add it before judging success. Maximums can chain; even a failing base check can become a success through the boost chain. Once d20 is reached, further boost dice stay d20.",
+                    "details": "A meaningful natural maximum raises the temporary Current Die one rung and marks 1 Growth box regardless of whether the final check succeeds, maximum 1 box per check. At 3/3 Growth, step the permanent Ability Die minimum up one rung, cross out current choices below the new minimum, then clear the boxes. d20 normally cannot grow further. After a Critical Boost, you may also immediately spend 5 Character Tokens to lock that exact action in as a Signature Move by recording its action, die-pool assignment, flavor, and relevant circumstances. Ability Signatures require the Ability used to have at least 2 Dots; Technique Signatures require the Technique used to be Rank 2 or higher."
           },
           {
                     "category": "Checks",
@@ -3108,7 +3172,7 @@
                     "category": "Character",
                     "title": "Tags",
                     "summary": "Tags state useful fictional truths about nature, reputation, background, body, culture, profession, supernatural state, affiliation, and similar qualities.",
-                    "details": "Tags do not automatically add +1/−1. They matter when another rule, Technique, Equipment effect, Expose, Inoculate, Vulnerability, or the fiction directly references them."
+                    "details": "Tags are mechanically actionable through justified interactions. Explain how your Tag affects a target Tag to gain Edge; a damaging interaction also adds +1 damage to a successful hit. Same interaction cannot stack Edge multiple times."
           },
           {
                     "category": "Character",
@@ -3576,6 +3640,7 @@
         ),
         activeAbility = "Athletics",
         rollEdge = "normal",
+        pendingAbilityRoll = null,
         selected = null,
         tokenMakerMode = "character",
         mobileObjectiveUndo = null,
@@ -3663,11 +3728,28 @@
       const allAbilities=Object.values(groups).flat();
 
       // ALPHA EXAMPLE EXPANSION — additive, descriptive only. No mechanical power changes.
-      const tagDictionary = {"Nature":["Human","Beast","Undead","Machine","Spirit","Demon","Fae","Corporate","Divine","Infernal","Digital","Swarm","Construct","Mutant","Alien","Plant","Elemental","Artificial","Psychic","Hybrid","Animal","Cursed","Celestial","Ghost","Cyborg","Shapeshifter","Humanitarian"],"Method":["Fire","Ice","Poison","Psychic","Holy","Shadow","Sonic","Gunfire","Blades","Fear","Disease","Surveillance","Ritual","Electric","Telepathy","Illusion","Smoke","Light","Darkness","Explosive","Chemical","Kinetic","Broadcast","Healing","Resonance","Summoning","Grappling","Hacking","Social","Acid","Weather"],"Weakness":["Silver","Sunlight","Truth","Fire","Cold Iron","Name","Music","Salt","Legal Authority","Public Shame","Mercy","Electricity","Running Water","Mirror","Darkness","Sound","Silence","Ritual Circle","Confession","Specific Frequency","Sacred Symbol","Isolation","Evidence","Known Pattern","Starvation","Open Flame"],"Social":["Authority","Celebrity","Criminal","Community","Sacred","Political","Police","Gang","Family","Labor","Corporate","Underworld","Union","Military","Academic","Healthcare","Religious","Outcast","Fanbase","Journalist","Bureaucracy","Aristocratic","Local","Connected","Hunted","Trusted","Infamous","Anonymous"],"Scale":["Massive","Tiny","Fast","Armored","Flying","Aquatic","Hidden","Stationary","Mobile","Remote","Close","Short","Standard","Long","Heavy","Light","Single Target","Crowd","Swarm","Local","Regional","Planetary","Vertical","Underground","Off-Road","Two-Handed"],"Consequence":["Traceable","Public","Infectious","Explosive","Corrupting","Illegal","Revered","Protected","Unstable","Conspicuous","Incriminating","Loud","Fragile","Temporary","Limited","Dangerous","Collateral","Notorious","Restricted","Rare","Experimental","Recorded","Contaminated","Wanted","Watched","Costly","Destructive"],"Equipment":["Concealable","Bulky","Loud","Silent","Restricted","Rare","Digital","Medical","Occult","Holy","Cursed","Experimental","Repair","Tools","Firearms","Nonlethal","Protective","Breaching","Disposable","Portable","Rechargeable","Ritual","Ammunition","Precision","Precision-Made","Improvised","Protective Gear","Biological","Vintage"],"Vehicle":["Fast","Armored","Quiet","Loud","Ordinary","Flashy","Illegal","Hidden Compartments","Off-Road","Heavy","Weaponized","Aquatic","Flying","Submersible","Reinforced","Crew","Personal","Utility","Pursuit","Stealth","Haunted","Autonomous","Stolen","Traceable","Public Transit","Cargo","Emergency","Convertible"]};
+      const tagDictionary = {"Nature":["Human","Beast","Undead","Machine","Spirit","Demon","Fae","Corporate","Divine","Infernal","Digital","Swarm","Construct","Mutant","Alien","Plant","Elemental","Artificial","Psychic","Hybrid","Animal","Cursed","Celestial","Ghost","Cyborg","Shapeshifter","Humanitarian"],"Method":["Laser","Fire","Ice","Poison","Psychic","Holy","Shadow","Sonic","Gunfire","Blades","Fear","Disease","Surveillance","Ritual","Electric","Telepathy","Illusion","Smoke","Light","Darkness","Explosive","Chemical","Kinetic","Broadcast","Healing","Resonance","Summoning","Grappling","Hacking","Social","Acid","Weather"],"Weakness":["Silver","Sunlight","Truth","Fire","Cold Iron","Name","Music","Salt","Legal Authority","Public Shame","Mercy","Electricity","Running Water","Mirror","Darkness","Sound","Silence","Ritual Circle","Confession","Specific Frequency","Sacred Symbol","Isolation","Evidence","Known Pattern","Starvation","Open Flame"],"Social":["Authority","Celebrity","Criminal","Community","Sacred","Political","Police","Gang","Family","Labor","Corporate","Underworld","Union","Military","Academic","Healthcare","Religious","Outcast","Fanbase","Journalist","Bureaucracy","Aristocratic","Local","Connected","Hunted","Trusted","Infamous","Anonymous"],"Scale":["Massive","Tiny","Fast","Armored","Flying","Aquatic","Hidden","Stationary","Mobile","Remote","Close","Short","Standard","Long","Heavy","Light","Single Target","Crowd","Swarm","Local","Regional","Planetary","Vertical","Underground","Off-Road","Two-Handed"],"Consequence":["Traceable","Public","Infectious","Explosive","Corrupting","Illegal","Revered","Protected","Unstable","Conspicuous","Incriminating","Loud","Fragile","Temporary","Limited","Dangerous","Collateral","Notorious","Restricted","Rare","Experimental","Recorded","Contaminated","Wanted","Watched","Costly","Destructive"],"Equipment":["Concealable","Bulky","Loud","Silent","Restricted","Rare","Digital","Medical","Occult","Holy","Cursed","Experimental","Repair","Tools","Firearms","Nonlethal","Protective","Breaching","Disposable","Portable","Rechargeable","Ritual","Ammunition","Precision","Precision-Made","Improvised","Protective Gear","Biological","Vintage"],"Vehicle":["Fast","Armored","Quiet","Loud","Ordinary","Flashy","Illegal","Hidden Compartments","Off-Road","Heavy","Weaponized","Aquatic","Flying","Submersible","Reinforced","Crew","Personal","Utility","Pursuit","Stealth","Haunted","Autonomous","Stolen","Traceable","Public Transit","Cargo","Emergency","Convertible"]};
       const tagGroupNotes = {
-        Nature:'What the subject is or how it exists.',Method:'How the effect or character acts.',Weakness:'A specific fictional vulnerability, never an automatic damage multiplier.',Social:'Affiliation, status, reputation or community role.',Scale:'Size, mobility, position or practical reach.',Consequence:'Risks, visibility, conditions and narrative liabilities.',Equipment:'Gear properties and constraints.',Vehicle:'Transport capabilities and problems.'
+        Nature:'What the subject is or how it exists.',Method:'How the effect or character acts.',Weakness:'A relevant Tag vulnerability can grant Edge, plus +1 damage on a successful damaging hit; never an automatic multiplier.',Social:'Affiliation, status, reputation or community role.',Scale:'Size, mobility, position or practical reach.',Consequence:'Risks, visibility, conditions and narrative liabilities.',Equipment:'Gear properties and constraints.',Vehicle:'Transport capabilities and problems.'
       };
       let techniqueAbilityFilter='All',equipmentCategoryFilter='All',assetClassFilter='All',assetSubFilter='All',tagDeskFilter='All';
+      // Universal Tag interaction: exactly one justified interaction can contribute
+      // one source of Edge (subject to normal Edge cancellation) and +1 damage
+      // to a successful damaging action. Narrative truth alone is not enough.
+      function rcSplitTags(value){return (Array.isArray(value)?value:String(value||'').split(',')).map(x=>String(x||'').trim()).filter(Boolean);}
+      function rcSingleWordTag(tag){return /^[^\s,<>/]+$/u.test(String(tag||'').trim());}
+      function rcTechniqueTagErrors(value){const tags=rcSplitTags(value),errors=[];if(tags.length!==3)errors.push('Every Technique must have exactly 3 Tags.');if(tags.some(t=>!rcSingleWordTag(t)))errors.push('Each Technique Tag must be a single word (for example Laser, Fire, Technology).');if(new Set(tags.map(t=>t.toLowerCase())).size!==tags.length)errors.push('A Technique cannot repeat the same Tag.');return errors;}
+      function rcTagInteraction(source,target,reason,enabled=true){
+        const from=String(source||'').trim(),to=String(target||'').trim(),why=String(reason||'').trim();
+        return {valid:!!(enabled&&from&&to&&why),source:from,target:to,reason:why};
+      }
+      function rcRollTagSources(){const c=state.character||{},tags=[...(c.tags||[])];
+        (c.techniques||[]).forEach(x=>{if(x&&typeof x==='object')tags.push(...rcSplitTags(x.tags));});
+        (c.equipment||[]).forEach(x=>{if(x&&typeof x==='object')tags.push(...rcSplitTags(x.tags));});
+        (c.loadoutRefs||[]).forEach(ref=>{try{const x=loadoutResolve(ref);if(x?.tags)tags.push(...rcSplitTags(x.tags));}catch(_){}});
+        return [...new Set(tags.map(x=>String(x).trim()).filter(Boolean))];
+      }
+      function rcTagPlayPrimer(){return `<div class="rc-tag-primer"><b>✦ TAG INTERACTIONS HAVE TEETH</b><p><strong>3 one-word Tags per Technique.</strong> A Laser Cannon might be <b>Laser / Fire / Technology</b>. When <b>Fire</b> hits an <b>Ice</b> Elemental, explain the interaction: <b>gain Edge</b>, and if the hit deals damage, <b>+1 damage</b>.</p><p>Applies to Character, Technique, Equipment, Team Asset, Threat, and Scene Tags. Name the source Tag, target Tag, and why they interact. One interaction supplies one Edge source; it cannot stack with itself. Follow normal Edge/Negative Edge cancellation. A relevant Tag can help without an attack: use Edge for access, defense, investigation, rescue, or social leverage. No interaction, no benefit. Specific powers such as Expose and Inoculate still apply.</p></div>`;}
       function tagStoredCustom(){
         if(!state||!state.library)return [];
         state.library.customTags ||= [];
@@ -3675,7 +3757,7 @@
         return state.library.customTags;
       }
       function allTagFamilies(){return {...tagDictionary,Custom:tagStoredCustom()};}
-      function tagPickerOptions(){return Object.entries(allTagFamilies()).map(([category,names])=>'<optgroup label="'+esc(category)+'">'+names.map(t=>'<option value="'+esc(t)+'">'+esc(t)+'</option>').join('')+'</optgroup>').join('');}
+      function tagPickerOptions(techniqueOnly=false){return Object.entries(allTagFamilies()).map(([category,names])=>'<optgroup label="'+esc(category)+'">'+names.filter(t=>!techniqueOnly||rcSingleWordTag(t)).map(t=>'<option value="'+esc(t)+'">'+esc(t)+'</option>').join('')+'</optgroup>').join('');}
       function applyExampleTag(target, tag){
         tag=String(tag||'').trim();if(!tag)return;
         if(target==='character'){
@@ -3684,11 +3766,18 @@
           let slot=d.tags.findIndex(x=>!String(x).trim());
           if(slot<0){const answer=prompt('All three Character Tag slots are filled. Replace which? Enter 1, 2, or 3.');slot=Number(answer)-1;if(!Number.isInteger(slot)||slot<0||slot>2)return;}
           d.tags[slot]=tag;renderCharacterBuilder();
-        }else if(['technique','equipment','asset'].includes(target)){
-          const d=state.creation[target];const old=String(d.tags||'').split(',').map(x=>x.trim()).filter(Boolean);
-          if(!old.some(x=>x.toLowerCase()===tag.toLowerCase()))old.push(tag);
+        }else if(['technique','equipment','asset','threat'].includes(target)){
+          const d=state.creation[target];const old=rcSplitTags(d.tags);
+          if(target==='technique'){
+            if(!rcSingleWordTag(tag))return alert('Technique Tags must be one word. Try a single-word synonym or a hyphenated form.');
+            if(old.length>=3&&!old.some(x=>x.toLowerCase()===tag.toLowerCase())){
+              const choice=Number(prompt('Techniques use exactly 3 Tags. Replace slot 1, 2, or 3?'));
+              if(!Number.isInteger(choice)||choice<1||choice>3)return;
+              old[choice-1]=tag;
+            }else if(!old.some(x=>x.toLowerCase()===tag.toLowerCase()))old.push(tag);
+          }else if(!old.some(x=>x.toLowerCase()===tag.toLowerCase()))old.push(tag);
           d.tags=old.join(', ');
-          if(target==='technique')renderTechniqueBuilder();else renderGearAssetBuilder();
+          if(target==='technique')renderTechniqueBuilder();else if(target==='threat')renderThreatBuilder();else renderGearAssetBuilder();
         }
         save(false);
       }
@@ -3705,6 +3794,7 @@
       }
       function renderTagDesk(){
         const el=document.getElementById('rc-tag-dictionary');if(!el)return;
+        if(!el.querySelector('.rc-tag-primer'))el.insertAdjacentHTML('afterbegin',rcTagPlayPrimer());
         const search=String(document.getElementById('rc-tag-search')?.value||'').trim().toLowerCase();
         const target=el.querySelector('#rc-tag-target')?.value||'character';
         const groups=Object.entries(allTagFamilies()).filter(([cat])=>tagDeskFilter==='All'||tagDeskFilter===cat);
@@ -3715,9 +3805,9 @@
         const custom=el.querySelector('#rc-custom-tags');if(custom)custom.innerHTML=tagStoredCustom().map(t=>'<span class="rc-custom-tag"><b>'+esc(t)+'</b><button title="Remove saved custom Tag" data-remove-tag="'+esc(t)+'">×</button></span>').join('')||'<small>No saved custom Tags yet; ordinary Tag fields already allow free typing.</small>';
         if(custom)custom.querySelectorAll('[data-remove-tag]').forEach(b=>b.addEventListener('click',()=>removeCustomTag(b.getAttribute('data-remove-tag'))));
       }
-      function tagAssistMarkup(target){return '<div class="rc-tag-assist builder-section" data-target="'+target+'"><h4>Tag Dictionary · '+target+'</h4><p class="inline-note">Choose a descriptive Tag, or type any custom Tag directly in the field above. Tags grant no automatic bonuses.</p><div class="rc-tag-assist-line"><select class="rc-tag-select" aria-label="Choose '+target+' Tag">'+tagPickerOptions()+'</select><button type="button" class="btn">Add Tag</button></div></div>';}
+      function tagAssistMarkup(target){return '<div class="rc-tag-assist builder-section" data-target="'+target+'"><h4>Tag Dictionary · '+target+'</h4><p class="inline-note">Name a Tag and how it affects another to earn Edge (+1 damage on a successful harming hit). Techniques require exactly 3 distinct one-word Tags; other entries keep their printed requirements. Custom Tags are welcome.</p><div class="rc-tag-assist-line"><select class="rc-tag-select" aria-label="Choose '+target+' Tag">'+tagPickerOptions(target==='technique')+'</select><button type="button" class="btn">Add Tag</button></div></div>';}
       function installTagAssist(){
-        for(const [id,targets] of [['characterBuilder',['character']],['techniqueBuilder',['technique']],['gearAssetBuilder',['equipment','asset']]]){
+        for(const [id,targets] of [['characterBuilder',['character']],['techniqueBuilder',['technique']],['gearAssetBuilder',['equipment','asset']],['threatBuilder',['threat']]]){
           const el=document.getElementById(id);if(!el||!el.innerHTML)return;
           for(const target of targets){
             if(el.querySelector('.rc-tag-assist[data-target="'+target+'"]'))continue;
@@ -3735,7 +3825,7 @@
         ...Object.entries(groups).flatMap(([parent,abilities])=>abilities.map(ability=>({category:'Technique Library',title:ability+' · Rank 1 Techniques',summary:techniqueExamples.filter(t=>t.ability===ability).map(t=>t.name+' ('+t.category+'/'+t.subtype+')').join(' • '),details:'Parent: '+parent+'. Rank 1; 1 Use. Open Create → Technique Builder to load, inspect and customize any example. Rank cannot exceed Governing Ability Dots.'}))),
         ...['Weapon','Protection','Tool','Consumable'].map(cat=>({category:'Equipment Library',title:cat+' Choices',summary:equipmentExamples.filter(e=>e.category===cat).map(e=>e.name+' R'+e.rank).join(' • '),details:'Every item uses the printed Rank/Availability economy. Common Rank 1 entries are available as starting gear; purchases and Uses follow Chapter 4.'})),
         ...Object.entries(assetSubcategories).flatMap(([cls,subs])=>subs.map(sub=>({category:'Team Asset Library',title:cls+' / '+sub,summary:assetExamples.filter(a=>a.classification===cls&&a.subcategory===sub).map(a=>a.name+' R'+a.rating).join(' • '),details:'Three printed assets per resource type, with Function, Use, and Vulnerability. Full entries available in Create → Gear / Assets.'}))),
-        ...Object.entries(tagDictionary).map(([cat,names])=>({category:'Tags',title:cat+' Tags',summary:names.join(' • '),details:tagGroupNotes[cat]+ ' Tags describe truth and permission. They never add Edge, damage, or actions by themselves.'}))
+        ...Object.entries(tagDictionary).map(([cat,names])=>({category:'Tags',title:cat+' Tags',summary:names.join(' • '),details:tagGroupNotes[cat]+ ' Tags describe real properties. When one Tag meaningfully affects another, that interaction grants one Edge source and +1 damage on a successful damaging hit. A Tag alone grants nothing.'}))
       );
       function setTechniqueExampleAbility(v){techniqueAbilityFilter=v;renderTechniqueBuilder();}
       function setEquipmentExampleCategory(v){equipmentCategoryFilter=v;renderGearAssetBuilder();}
@@ -4130,19 +4220,26 @@
       }
       const ABILITY_DIE_LADDER=[4,6,8,10,12,20];
       function abilityDieIndex(die){return ABILITY_DIE_LADDER.indexOf(+die);}
-      function abilityPermanentDie(name){const a=typeof name==="string"?state.character.abilities?.[name]:name;const d=+(a?.permanentDie??a?.currentDie??a?.die??4);return ABILITY_DIE_LADDER.includes(d)?d:4;}
+      function abilityPermanentDie(name){const a=typeof name==='string'?state.character.abilities?.[name]:name;const die=+(a?.permanentDie??a?.die??4);return ABILITY_DIE_LADDER.includes(die)?die:4;}
       function abilityScarCap(name){const caps=(state.character.scars||[]).filter(x=>x&&x.ability===name&&ABILITY_DIE_LADDER.includes(+x.cap)).map(x=>+x.cap);return caps.length?Math.min(...caps):null;}
-      function abilityCurrentDie(name){const a=typeof name==="string"?state.character.abilities?.[name]:name;const d=+(a?.currentDie??a?.die??abilityPermanentDie(a));return ABILITY_DIE_LADDER.includes(d)?d:abilityPermanentDie(a);}
-      function abilityRollDie(name){const current=abilityCurrentDie(name),cap=abilityScarCap(typeof name==='string'?name:'');return cap?Math.min(current,cap):current;}
-      function syncAbilityCurrentDie(name,opts={}){const a=state.character.abilities?.[name];if(!a)return;let current=abilityCurrentDie(name);if(opts.defaultToPermanent && !ABILITY_DIE_LADDER.includes(+a.currentDie))current=abilityPermanentDie(name);const cap=abilityScarCap(name);if(cap&&abilityDieIndex(current)>abilityDieIndex(cap))current=cap;if(!ABILITY_DIE_LADDER.includes(current))current=abilityPermanentDie(name);a.currentDie=current;a.die=current;}
-      function setAbilityCurrentDie(name,die){die=+die;if(!ABILITY_DIE_LADDER.includes(die))return;const a=state.character.abilities?.[name];if(!a)return;const cap=abilityScarCap(name);if(cap&&abilityDieIndex(die)>abilityDieIndex(cap))return alert(`${name} is currently Scar-capped at d${cap}. Remove or rehabilitate the Scar before marking a higher temporary die.`);const next=(abilityCurrentDie(name)===die&&die!==abilityPermanentDie(name))?abilityPermanentDie(name):die;a.currentDie=next;a.die=next;save(false);renderCharacter();}
+      function abilityCurrentDie(name){const a=typeof name==='string'?state.character.abilities?.[name]:name;const permanent=abilityPermanentDie(a),marked=+(a?.currentDie??a?.die??permanent);return ABILITY_DIE_LADDER.includes(marked)?Math.max(marked,permanent):permanent;}
+      // Permanent is the floor for the saved Current Die. A Scar temporarily
+      // limits the ROLLED value without deleting or lowering the saved mark.
+      function abilityRollDie(name){const current=abilityCurrentDie(name),cap=abilityScarCap(name);return cap?Math.min(current,cap):current;}
+      function syncAbilityCurrentDie(name){const a=state.character.abilities?.[name];if(!a)return;const current=abilityCurrentDie(name);a.currentDie=current;a.die=current;}
+      function setAbilityCurrentDie(name,die){
+        die=+die;const a=state.character.abilities?.[name];if(!a||!ABILITY_DIE_LADDER.includes(die))return;
+        const minimum=abilityPermanentDie(name);
+        if(die<minimum)return alert(`d${die} is below ${name}'s permanent d${minimum} minimum and cannot be selected.`);
+        a.currentDie=die;syncAbilityCurrentDie(name);save(false);renderCharacter();
+      }
       function setPermanentAbilityDie(name,die){
         if(studioMode!=="play"||!document.querySelector('.tabs button[data-tab="growth"].on'))return alert("Record permanent dice corrections from Growth & Acquisitions.");
         die=+die;if(!ABILITY_DIE_LADDER.includes(die))return;
         const a=state.character.abilities?.[name];if(!a)return;
         const old=abilityPermanentDie(a);if(old===die)return;
         if(!confirm(`Record ${name}'s permanent Ability Die as d${die}?\n\nThis is a manual sheet correction. Normal permanent die advancement comes from resolving 3 Growth boxes.`))return;
-        a.permanentDie=die;if(abilityCurrentDie(name)===old)a.currentDie=die;syncAbilityCurrentDie(name,{defaultToPermanent:true});
+        a.permanentDie=die;syncAbilityCurrentDie(name);
         if(typeof growthLog==="function")growthLog(`${name} permanent Ability Die manually recorded as d${die}.`);
         save(false);renderCharacter();renderRoster();if(typeof renderGrowth==="function")renderGrowth();
       }
@@ -4162,12 +4259,21 @@
         const oldAbility=sc.ability;sc.ability=ability;
         if(ability){const base=abilityPermanentDie(ability),idx=ABILITY_DIE_LADDER.indexOf(base);sc.cap=ABILITY_DIE_LADDER[Math.max(0,idx-1)];}
         else sc.cap=null;
-        if(oldAbility)syncAbilityCurrentDie(oldAbility,{defaultToPermanent:true});if(ability)syncAbilityCurrentDie(ability,{defaultToPermanent:true});
+        if(oldAbility)syncAbilityCurrentDie(oldAbility);if(ability)syncAbilityCurrentDie(ability);
         save(false);renderCharacter();if(typeof renderGrowth==="function")renderGrowth();
       }
       function addCharacterScar(){state.character.scars ||= [];if(state.character.scars.length>=3)return alert("The paper sheet provides three Scar rows. Remove or rehabilitate one before adding another here.");state.character.scars.push({id:makeId(),name:"New Scar",ability:"",cap:null,notes:""});save(false);renderCharacter();}
-      function updateCharacterScar(i,field,value){const sc=state.character.scars?.[i];if(!sc)return;if(field==="cap")value=+value||null;sc[field]=value;if(sc.ability)syncAbilityCurrentDie(sc.ability,{defaultToPermanent:true});save(false);renderCharacter();if(typeof renderGrowth==="function")renderGrowth();}
-      function removeCharacterScar(i){const sc=state.character.scars?.[i],ability=sc?.ability;if(!confirm("Remove this Scar from the sheet? Use this only when rehabilitation or another rule removes it."))return;state.character.scars.splice(i,1);if(ability)syncAbilityCurrentDie(ability,{defaultToPermanent:true});save(false);renderCharacter();if(typeof renderGrowth==="function")renderGrowth();}
+      function updateCharacterScar(i,field,value){const sc=state.character.scars?.[i];if(!sc)return;if(field==="cap")value=+value||null;sc[field]=value;if(sc.ability)syncAbilityCurrentDie(sc.ability);save(false);renderCharacter();if(typeof renderGrowth==="function")renderGrowth();}
+      function rcResolveBankedGrowthAfterRehab(ability){
+        const a=state.character.abilities?.[ability];if(!a||(+a.growth||0)<3)return;
+        const base=abilityPermanentDie(ability),next=ABILITY_DIE_LADDER[ABILITY_DIE_LADDER.indexOf(base)+1],cap=abilityScarCap(ability);
+        if(!next||cap&&next>cap)return;
+        a.permanentDie=next;a.growth=0;
+        if(abilityCurrentDie(ability)===base)a.currentDie=next;
+        syncAbilityCurrentDie(ability);
+        if(typeof growthLog==='function')growthLog(`${ability} banked 3/3 Growth resolved after Scar rehabilitation: d${base} to d${next}.`,'',0);
+      }
+      function removeCharacterScar(i){const sc=state.character.scars?.[i],ability=sc?.ability;if(!confirm("Remove this Scar from the sheet? Use this only when rehabilitation or another rule removes it."))return;state.character.scars.splice(i,1);if(ability){syncAbilityCurrentDie(ability);rcResolveBankedGrowthAfterRehab(ability);}save(false);renderCharacter();if(typeof renderGrowth==="function")renderGrowth();}
 
       function setConsequenceText(kind,i,value){state.character[kind][i]=value;save(false);}
       function toggleConsequenceUse(kind,i){const k=kind==="boon"?"boonUsed":"baneUsed";state.character[k][i]=!state.character[k][i];save(false);renderCharacter();}
@@ -4218,7 +4324,7 @@
         state.character.edgeNotes ||= "";state.character.negativeEdgeNotes ||= "";state.character.temporaryHealthNotes ||= "";state.character.shieldNotes ||= "";state.character.otherEffects ||= "";state.character.tokenNotes ||= "";
         state.character.boons ||= ["","",""];state.character.banes ||= ["","",""];state.character.boonUsed ||= [false,false,false];state.character.baneUsed ||= [false,false,false];
         state.character.scars=Array.isArray(state.character.scars)?state.character.scars.map(x=>typeof x==="string"?{id:makeId(),name:x,ability:"",cap:null,notes:""}:{id:x.id||makeId(),name:x.name||"",ability:x.ability||"",cap:x.cap?+x.cap:null,notes:x.notes||""}):[];
-        for(const n of allAbilities){const a=state.character.abilities[n]||(state.character.abilities[n]={die:4,permanentDie:4,currentDie:4,dots:0,growth:0});if(!ABILITY_DIE_LADDER.includes(+a.permanentDie))a.permanentDie=ABILITY_DIE_LADDER.includes(+a.currentDie)?+a.currentDie:(ABILITY_DIE_LADDER.includes(+a.die)?+a.die:4);a.growth=Math.max(0,Math.min(3,+a.growth||0));syncAbilityCurrentDie(n,{defaultToPermanent:true});}
+        for(const n of allAbilities){const a=state.character.abilities[n]||(state.character.abilities[n]={die:4,permanentDie:4,currentDie:4,dots:0,growth:0});if(!ABILITY_DIE_LADDER.includes(+a.permanentDie))a.permanentDie=ABILITY_DIE_LADDER.includes(+a.currentDie)?+a.currentDie:(ABILITY_DIE_LADDER.includes(+a.die)?+a.die:4);a.growth=Math.max(0,Math.min(3,+a.growth||0));syncAbilityCurrentDie(n);}
         (state.character.techniques||[]).forEach(t=>{if(t&&typeof t==="object")techniqueUsesRemaining(t);});
         (state.character.equipment||[]).forEach(x=>{if(x&&typeof x==="object")equipmentUsesRemaining(x);});
         (state.team.reserve||[]).forEach(x=>{if(x&&typeof x==="object")equipmentUsesRemaining(x);});
@@ -4230,7 +4336,7 @@
 
         abilities.innerHTML=Object.entries(groups).map(([g,list])=>`<section class="ag paper-ability-group"><h3 data-guide-key="abilities">${g} Abilities</h3><div class="ability-head"><span>Ability</span><span>Permanent Die</span><span>Current Die</span><span>Dots</span><span>Growth</span><span>Roll</span></div>${list.map(n=>{
           const a=state.character.abilities[n],base=abilityPermanentDie(n),current=abilityCurrentDie(n),rollDie=abilityRollDie(n),cap=abilityScarCap(n),direct=edgeSourcesForAbility(n);
-          return `<div class="ability ${direct.length?"has-build-edge":""}"><b>${n}${direct.length?` <span class="ability-edge-badge">EDGE · ${esc(direct.map(x=>x.kind).join(" + "))}</span>`:""}</b><div class="die-ladder" title="Permanent owned die denomination">${ABILITY_DIE_LADDER.map(d=>`<button class="die-step ${base===d?"permanent":""}" onclick="goGrowth()" title="Open Growth to change permanent dice.">d${d}</button>`).join("")}<span class="ability-click-help">Permanent changes happen in Growth.</span></div><div class="die-ladder" title="Temporary current die for play right now">${ABILITY_DIE_LADDER.map(d=>`<button class="die-step ${current===d?"current":""} ${cap&&abilityDieIndex(d)>abilityDieIndex(cap)?"locked":""} ${cap===d?"scar-cap":""}" onclick="setAbilityCurrentDie('${n}',${d})" title="Mark the current temporary die for this Ability.">d${d}</button>`).join("")}${cap?`<small>Scar cap active: d${cap}${rollDie!==current?` · rolling capped at d${rollDie}`:""}</small>`:`<span class="ability-meta-note">Current marked die: d${current}</span>`}</div><div class="dots">${[1,2,3,4,5].map(x=>`<button class="${a.dots>=x?"on":""}" onclick="goGrowth()" title="Open Growth to advance Ability Dots."></button>`).join("")}</div><div class="growth" title="Current in-play Growth Pool">${[1,2,3].map(x=>`<button class="${a.growth>=x?"on":""}" onclick="setAbilityGrowth('${n}',${a.growth===x?x-1:x})" aria-label="${n} Growth box ${x}"></button>`).join("")}<span class="ability-meta-note">${a.growth||0}/3 marked</span></div><button class="roll" onclick="openRoll('${n}','${g}')">🎲 d${rollDie}</button></div>`;
+          return `<div class="ability ${direct.length?"has-build-edge":""}"><b>${n}${direct.length?` <span class="ability-edge-badge">EDGE · ${esc(direct.map(x=>x.kind).join(" + "))}</span>`:""}</b><div class="die-ladder" title="Permanent owned die denomination"><span class="ability-field-label">PERMANENT DIE</span>${ABILITY_DIE_LADDER.map(d=>`<button class="die-step ${base===d?"permanent":""}" onclick="goGrowth()" title="Open Growth to change permanent dice.">d${d}</button>`).join("")}<span class="ability-click-help">Permanent is the minimum for Current Die.</span></div><div class="die-ladder" title="Temporary current die for play right now"><span class="ability-field-label">CURRENT DIE · CLICK TO MARK</span>${ABILITY_DIE_LADDER.map(d=>`<button class="die-step ${current===d?"current":""} ${d<base?"below-permanent":""} ${cap===d?"scar-cap":""}" ${d<base?'disabled aria-disabled="true"':''} onclick="setAbilityCurrentDie('${n}',${d})" title="${d<base?`X · Below permanent d${base} minimum`:`Mark d${d} as the current temporary die`}">d${d}</button>`).join("")}${cap?`<small>Scar cap active: d${cap}${rollDie!==current?` · rolling capped at d${rollDie}`:""}</small>`:`<span class="ability-meta-note">Marked: d${current} · Rolls use d${rollDie} · Min d${base}</span>`}<button class="die-reset" type="button" onclick="setAbilityCurrentDie('${n}',${base})" title="Reset temporary current die to permanent die">RESET TO PERMANENT</button></div><div class="dots"><span class="ability-field-label">ABILITY DOTS</span>${[1,2,3,4,5].map(x=>`<button class="${a.dots>=x?"on":""}" onclick="goGrowth()" title="Open Growth to advance Ability Dots."></button>`).join("")}</div><div class="growth" title="Current in-play Growth Pool"><span class="ability-field-label">GROWTH · CLICK TO MARK</span>${[1,2,3].map(x=>`<button class="${a.growth>=x?"on":""}" onclick="setAbilityGrowth('${n}',${a.growth===x?x-1:x})" aria-label="${n} Growth box ${x}"></button>`).join("")}<span class="ability-meta-note">${a.growth||0}/3 marked</span></div><button class="roll" onclick="openRoll('${n}','${g}')">🎲 d${rollDie}</button></div>`;
         }).join("")}</section>`).join("");
 
         const c=state.character;
@@ -4243,7 +4349,7 @@
 
         techniques.innerHTML=`<label>Learn / Add Technique<select onchange="playTechniqueSelect(this.value)">${catalogOptions("technique","",{rank1:true})}</select></label><p class="inline-note">Use the pips as pencil marks. Filled = use ready; empty = spent. Setup Recovery restores uses according to the normal Recovery procedure.</p>`+(state.character.techniques||[]).map((t,i)=>typeof t==="string"?(t.trim()?`<input placeholder="Legacy Technique ${i+1}" value="${esc(t)}" oninput="state.character.techniques[${i}]=this.value;save(false)">`:""):(()=>{
           const max=Math.max(1,+t.rank||1),remaining=techniqueUsesRemaining(t);
-          return `<div class="tech-sheet-card paper-tech"><div><b>${esc(t.name)}</b><br><small>${esc(techniqueSummary(t))}</small></div><div class="use-pips" title="Available Technique Uses">${Array.from({length:max},(_,j)=>`<button class="${remaining>j?"on":""}" onclick="setTechniqueUses(${i},${remaining===j+1?j:j+1})" aria-label="Technique Use ${j+1}"></button>`).join("")}</div><div class="mini-actions"><button onclick="editCharacterTechnique(${i})">Edit</button><button onclick="removeCharacterTechnique(${i})">Remove</button></div></div>`;
+          return `<div class="tech-sheet-card paper-tech"><div><b>${esc(t.name)}</b><br><small>${esc(techniqueSummary(t))}</small>${rcTechniqueTagErrors(t.tags).length?`<small style="display:block;color:#ad3c23;font-weight:900">⚠ Legacy Tags: edit to exactly 3 distinct one-word Tags.</small>`:''}</div><div class="use-pips" title="Available Technique Uses">${Array.from({length:max},(_,j)=>`<button class="${remaining>j?"on":""}" onclick="setTechniqueUses(${i},${remaining===j+1?j:j+1})" aria-label="Technique Use ${j+1}"></button>`).join("")}</div><div class="mini-actions"><button onclick="editCharacterTechnique(${i})">Edit</button><button onclick="removeCharacterTechnique(${i})">Remove</button></div></div>`;
         })()).join("");
 
         const slotNames=["Weapon 1","Weapon 2","Protection","Tool 1","Tool 2","Consumable 1","Consumable 2","Consumable 3"];
@@ -4336,7 +4442,7 @@
       }
       function renderTeam() {
         roster.innerHTML = state.team.roster.map((x,i)=>`<input placeholder="Cast member ${i+1}" value="${esc(x)}" oninput="state.team.roster[${i}]=this.value;save(false)">`).join("");
-        assets.innerHTML = `<label>Add / Acquire Asset<select onchange="playAssetSelect(this.value)">${catalogOptions("asset")}</select></label><p class="inline-note">Existing designs route through Growth & Acquisitions for Team Token payment. Custom… opens the rules-enforced Asset Builder.</p>` + state.team.assets.map((x,i)=>typeof x==="string"?`<input placeholder="Legacy Asset ${i+1}" value="${esc(x)}" oninput="state.team.assets[${i}]=this.value;save(false)">`:`<div class="tech-sheet-card"><b>${esc(x.name)}</b> · R${x.rating} ${esc(x.classification)}/${esc(x.subcategory)} · ${esc(x.state||"Fine")}<br><span class="inline-note">${esc(x.functionText||"")} ${esc(x.use||"")}</span><div class="mini-actions"><button onclick="removeTeamAsset(${i})">Remove</button></div></div>`).join("");
+        assets.innerHTML = `<label>Add / Acquire Asset<select onchange="playAssetSelect(this.value)">${catalogOptions("asset")}</select></label><p class="inline-note">Existing designs route through Growth & Acquisitions for Team Token payment. Custom… opens the rules-enforced Asset Builder.</p>` + state.team.assets.map((x,i)=>typeof x==="string"?`<input placeholder="Legacy Asset ${i+1}" value="${esc(x)}" oninput="state.team.assets[${i}]=this.value;save(false)">`:`<div class="tech-sheet-card"><b>${esc(x.name)}</b> · R${x.rating} ${esc(x.classification)}/${esc(x.subcategory)} · ${esc(x.state||"Fine")}<br><small>Tags: ${esc(rcSplitTags(x.tags).join(' / ')||'None recorded')} · Use Tag interactions for Edge and +1 damage on a successful damaging hit.</small><br><span class="inline-note">${esc(x.functionText||"")} ${esc(x.use||"")}</span><div class="mini-actions"><button onclick="removeTeamAsset(${i})">Remove</button></div></div>`).join("");
         const tr=document.getElementById("teamReserve"); if(tr) tr.innerHTML=`<label>Acquire Equipment<select onchange="playEquipmentSelect(this.value)">${catalogOptions("equipment")}</select></label><p class="inline-note">Purchased Equipment lives in Team Reserve and becomes available in Character Mission Loadout dropdowns.</p>`+((state.team.reserve||[]).map((x,i)=>`<div class="tech-sheet-card"><b>${esc(x.name)}</b> · R${x.rank} ${esc(x.category)} · ${esc(x.availability)} · ${x.uses} Uses<br><span class="inline-note">${esc(x.effect||"")}</span><div class="mini-actions"><button onclick="removeReserveEquipment(${i})">Remove</button></div></div>`).join("")||`<p class="inline-note">No purchased Equipment in Team Reserve.</p>`);
       }
       function removeTeamAsset(i){state.team.assets.splice(i,1);save(false);renderTeam();}
@@ -4408,7 +4514,7 @@
         const base=abilityPermanentDie(name),i=ABILITY_DIE_LADDER.indexOf(base);if(i<0)return alert(`${name} has an unrecognized permanent Ability Die.`);if(i>=ABILITY_DIE_LADDER.length-1)return alert(`${name} is already at d20; it cannot normally grow further.`);
         const next=ABILITY_DIE_LADDER[i+1],cap=abilityScarCap(name),wasCurrent=abilityCurrentDie(name);
         if(cap&&next>cap)return alert(`${name} has 3/3 Growth ready, but its active Scar caps advancement at d${cap}. Keep the Growth marked until rehabilitation removes the cap.`);
-        a.permanentDie=next;a.growth=0;if(wasCurrent===base)a.currentDie=next;syncAbilityCurrentDie(name,{defaultToPermanent:true});growthLog(`${name} permanent Ability Die advanced from d${base} to d${next} from 3 Growth boxes.`);save(false);renderCharacter();renderRoster();renderGrowth();
+        a.permanentDie=next;a.growth=0;if(wasCurrent===base)a.currentDie=next;syncAbilityCurrentDie(name);growthLog(`${name} permanent Ability Die advanced from d${base} to d${next} from 3 Growth boxes.`);save(false);renderCharacter();renderRoster();renderGrowth();
       }
       function growthBuyAbility(){
         const name=state.growth.selections.ability||"Athletics",a=state.character.abilities[name];if(!a)return;
@@ -4426,7 +4532,7 @@
       }
       function growthBuyTechnique(){
         const ref=state.growth.selections.technique;if(!ref)return alert("Choose a Technique first.");const entry=catalogResolve("technique",ref);if(!entry)return;
-        const src=entry.item;if((+src.rank||1)!==1)return alert("A new Character Technique must be acquired at Rank 1. Use an eligible Rank 1 design or create one with Custom…");
+        const src=entry.item;const tagIssues=rcTechniqueTagErrors(src.tags);if(tagIssues.length)return alert(`${src.name} is a legacy Technique with noncompliant Tags. Edit this design to use exactly 3 distinct one-word Tags before learning it.\n`+tagIssues.join("\n"));if((+src.rank||1)!==1)return alert("A new Character Technique must be acquired at Rank 1. Use an eligible Rank 1 design or create one with Custom…");
         if(!growthCanAdvance())return alert("Permanent Character advancement unlocks after this player's first Mission Resolution.");
         if((+state.character.abilities[src.ability]?.dots||0)<1)return alert(`${src.name} is governed by ${src.ability}; you need at least 1 Dot there.`);
         const dupe=(state.character.techniques||[]).find(x=>x&&typeof x==="object"&&(x.designId===ref||String(x.name||"").toLowerCase()===String(src.name||"").toLowerCase()));if(dupe)return alert(`${src.name} is already owned. Upgrade the owned Technique instead.`);
@@ -5295,7 +5401,13 @@
               : g === "Spiritual"
                 ? "Spirit"
                 : "Body";
+        pendingAbilityRoll=null;
         rollResult.innerHTML = "";
+        const suggestions=rcRollTagSources();
+        const presets=document.getElementById('rcRollTagOptions');if(presets)presets.innerHTML=[...new Set([...suggestions,...Object.values(allTagFamilies()).flat()])].map(x=>`<option value="${esc(x)}"></option>`).join('');
+        for(const id of ['rcTagApply','rcTagDamage']){const el=document.getElementById(id);if(el)el.checked=id==='rcTagDamage';}
+        for(const id of ['rcTagSource','rcTagTarget','rcTagReason']){const el=document.getElementById(id);if(el)el.value='';}
+        rollStartButton.textContent="ROLL ABILITY DIE";
         const sources=deriveEdgeSources().filter(x=>!x.used&&(!x.ability||x.ability===a));
         if(rollEdgeSources){
           rollEdgeSources.hidden=!sources.length;
@@ -5304,6 +5416,7 @@
         rollModal.classList.add("on");
       }
       function closeRoll() {
+        pendingAbilityRoll=null;
         rollModal.classList.remove("on");
       }
       document.querySelectorAll("[data-edge]").forEach(
@@ -5320,23 +5433,118 @@
         if(mpIsHost()){state.director.lastRoll={...roll,who:multiplayer.displayName||"Director",at:Date.now()};mpLog("DIRECTOR",`${roll.ability||"Check"}: ${roll.total} ${roll.success?"SUCCESS":"FAILURE"}${roll.natural?` · ${roll.natural}`:""}`,"ROLL");}
         else if(mpIsPlayer())mpSendToHost({kind:"roll_event",roll:{...roll,who:multiplayer.displayName||state.character.name||"Player",at:Date.now()}});
       }
-      function makeRoll() {
-        const a=state.character.abilities[activeAbility],
-          die=abilityRollDie(activeAbility),
-          dice=Array.from({length:rollEdge==="normal"?1:2},()=>1+Math.floor(Math.random()*die)),
-          kept=rollEdge==="edge"?Math.max(...dice):rollEdge==="negative"?Math.min(...dice):dice[0],
-          stat=rollStat.value,
-          total=kept+state.character.stats[stat]+a.dots+(+rollBonus.value||0),
-          ok=total>=+rollDif.value,
-          nat=kept===die&&ok?"Critical Boost":kept===1&&!ok?"Critical Error":"";
-        rollResult.className="result "+(ok?"":"fail");
-        const growthAction=nat==="Critical Boost"
-          ? `<button class="btn yellow" onclick="changeAbilityGrowth('${activeAbility}',1);closeRoll()">MARK +1 GROWTH</button>`
-          : nat==="Critical Error"
-            ? `<button class="btn" onclick="changeAbilityGrowth('${activeAbility}',-1);closeRoll()">REMOVE 1 GROWTH</button>`
-            : "";
-        rollResult.innerHTML=`<span>${dice.join(" · ")}</span><br><strong>${total}</strong> — <b>${ok?"SUCCESS":"FAILURE"}</b>${nat?"<br>"+nat:""}${growthAction?`<div class="roll-growth-action">${growthAction}<small>Growth is a separate in-play 3-box pool. Use this only when the check meets the meaningful-play requirement.</small></div>`:""}`;
-        mpPublishRoll({ability:activeAbility,stat,die:`d${die}`,dice,kept,dots:+a.dots||0,bonus:+rollBonus.value||0,difficulty:+rollDif.value||0,edge:rollEdge,total,success:ok,natural:nat});
+      // Natural maximums trigger exploding-die boosts immediately, regardless
+      // of the interim result. Success is calculated AFTER all boost dice and
+      // optional post-roll Character Tokens. Effects are committed once at finalize.
+      function rcRandomFace(sides){return 1+Math.floor(Math.random()*sides);}
+      function rcCriticalChain(baseDie, limit=100){
+        const results=[];
+        let sides=baseDie;
+        for(let i=0;i<limit;i++){
+          const idx=ABILITY_DIE_LADDER.indexOf(sides);
+          sides=ABILITY_DIE_LADDER[Math.min(idx+1,ABILITY_DIE_LADDER.length-1)];
+          const face=rcRandomFace(sides);
+          results.push({die:sides,face});
+          if(face!==sides)break;
+        }
+        return results;
+      }
+      function makeRoll(){
+        if(!activeAbility||!state.character.abilities?.[activeAbility])return;
+        const a=state.character.abilities[activeAbility];
+        const die=abilityRollDie(activeAbility);
+        const tag=rcTagInteraction(document.getElementById('rcTagSource')?.value,document.getElementById('rcTagTarget')?.value,document.getElementById('rcTagReason')?.value,!!document.getElementById('rcTagApply')?.checked);
+        if(document.getElementById('rcTagApply')?.checked&&!tag.valid)return alert('To earn Tag interaction Edge, name your Tag, the target Tag, and explain the interaction.');
+        const tagDamage=tag.valid&&!!document.getElementById('rcTagDamage')?.checked;
+        // Tag Edge is one source. It cancels an existing Negative Edge; it does
+        // not grant a second reroll on top of normal Advantage.
+        const effectiveEdge=tag.valid?(rollEdge==='negative'?'normal':'edge'):rollEdge;
+        const dice=Array.from({length:effectiveEdge==='normal'?1:2},()=>rcRandomFace(die));
+        const kept=effectiveEdge==='edge'?Math.max(...dice):effectiveEdge==='negative'?Math.min(...dice):dice[0];
+        const stat=rollStat.value;
+        const difficulty=Number(rollDif.value);
+        const bonus=Number(rollBonus.value)||0;
+        const method=String(rollMethod.value||'').trim();
+        if(!Number.isFinite(difficulty))return alert('Enter a valid Difficulty.');
+        const dots=Number(a.dots)||0, core=Number(state.character.stats[stat])||0;
+        const baseTotal=kept+core+dots+bonus;
+        // Roll exploding dice NOW, not after a provisional success check.
+        // They are saved with this pending roll so Token changes cannot reroll them.
+        const boostDice=kept===die?rcCriticalChain(die):[];
+        const boostTotal=boostDice.reduce((n,x)=>n+x.face,0);
+        pendingAbilityRoll={ability:activeAbility,stat,die,dice,kept,edge:effectiveEdge,manualEdge:rollEdge,tag,tagDamage,method,core,dots,bonus,difficulty,baseTotal,boostDice,boostTotal};
+        const available=Math.max(0,Math.floor(+state.character.tokens||0));
+        const faces=dice.map(face=>`<span class="roll-dice-chip ${face===kept?'kept':''}">d${die} · ${face}</span>`).join('');
+        const chain=boostDice.length?`<div class="roll-boost-preview"><b>✦ NATURAL MAX · BOOST CHAIN AUTOMATICALLY ROLLED</b><div class="roll-chain">${boostDice.map(x=>`<span class="roll-dice-chip">d${x.die} → ${x.face}</span>`).join('<span>＋</span>')}</div><b>${baseTotal} base + ${boostTotal} boost = ${baseTotal+boostTotal} before Tokens</b><p>Boosts count toward reaching TN ${difficulty}, even when the original d${die} alone cannot succeed.</p></div>`:'';
+        rollResult.className='result';
+        rollResult.innerHTML=`<div class="roll-base-card">${tag.valid?`<div class="rc-tag-primer"><b>Tag Edge: ${esc(tag.source)} → ${esc(tag.target)}</b> · ${esc(tag.reason)}<br>Effective Edge: ${effectiveEdge}${tagDamage?' · +1 damage on hit':''}</div>`:''}<b>BASE ROLL · ${esc(activeAbility)}</b><div class="roll-dice-strip">${faces}</div><div class="roll-result-breakdown">Kept ${kept} + ${stat} ${core>=0?'+':''}${core} + ${dots} Ability Dots + ${bonus} Technique Bonus = <b>${baseTotal}</b> vs TN ${difficulty}</div>${chain}<div class="roll-delta-note">${kept===die?'Natural maximum! Boost dice rolled automatically regardless of initial success. Final result includes the full chain.':kept===1&&baseTotal<difficulty?'Natural minimum: a Critical Error occurs only if the final check fails after Tokens.':'You may spend Tokens before the outcome is finalized.'}</div></div><div class="roll-finalize-pane"><label>Spend Character Tokens <input id="rollTokenSpend" type="number" min="0" max="${available}" step="1" value="0" aria-label="Character Tokens to spend on this check"><span>${available} available · +1 per Token</span></label><label><input id="rollMeaningful" type="checkbox" checked>Meaningful check eligible for Current Die and Growth advancement (Storyteller can deny trivial rolls)</label><button class="btn yellow" type="button" onclick="finalizeAbilityRoll()">FINALIZE CHECK · RESOLVE CRITICALS</button></div>`;
+        rollStartButton.textContent='REROLL BASE DIE';
+      }
+      function finalizeAbilityRoll(){
+        const roll=pendingAbilityRoll;
+        if(!roll)return;
+        const raw=document.getElementById('rollTokenSpend')?.value||'0', tokens=Number(raw);
+        const available=Math.max(0,Math.floor(+state.character.tokens||0));
+        if(!Number.isInteger(tokens)||tokens<0||tokens>available)return alert(`Spend a whole number of Tokens between 0 and ${available}.`);
+        const meaningful=!!document.getElementById('rollMeaningful')?.checked;
+        const a=state.character.abilities[roll.ability];
+        const before=+a.growth||0;
+        const priorDie=abilityPermanentDie(roll.ability);
+        const priorCurrent=abilityCurrentDie(roll.ability);
+        const boostDice=roll.boostDice||[];
+        const bonusTotal=roll.boostTotal||0;
+        const total=roll.baseTotal+bonusTotal+tokens;
+        const success=total>=roll.difficulty;
+        const interactionDamage=success&&roll.tag?.valid&&roll.tagDamage?1:0;
+        // Natural max is a boost independent of success; natural min only
+        // errors on actual failure after Tokens have been applied.
+        const critical=roll.kept===roll.die?'Critical Boost':roll.kept===1&&!success?'Critical Error':'';
+        state.character.tokens=available-tokens;
+        let growthNote='',currentNote='';
+        if(critical==='Critical Boost'){
+          if(meaningful){
+            // A single meaningful natural-max check steps the temporary/current
+            // denomination by one rung. Chained explosions still add their faces
+            // to THIS check but do not farm extra permanent Growth boxes.
+            const i=ABILITY_DIE_LADDER.indexOf(priorCurrent);
+            const upgraded=ABILITY_DIE_LADDER[Math.min(i+1,ABILITY_DIE_LADDER.length-1)];
+            a.currentDie=upgraded;
+            syncAbilityCurrentDie(roll.ability);
+            currentNote=upgraded>priorCurrent?`Temporary Current Die d${priorCurrent} → d${upgraded} (regardless of success).`:'Temporary Current Die already at d20.';
+            if(priorDie===20)growthNote='Permanent die already at d20: no further normal Growth.';
+            else {
+              a.growth=Math.min(3,before+1);
+              if(a.growth===3){
+                const cap=abilityScarCap(roll.ability);
+                const next=ABILITY_DIE_LADDER[ABILITY_DIE_LADDER.indexOf(priorDie)+1];
+                if(cap&&next>cap)growthNote=`Growth 3/3 banked; Scar cap d${cap} blocks the permanent step until rehabilitation.`;
+                else {
+                  a.permanentDie=next;
+                  a.growth=0;
+                  syncAbilityCurrentDie(roll.ability);
+                  growthNote=`Growth 3/3! Permanent minimum d${priorDie} → d${next}. Lower Current Die choices are now crossed out.`;
+                  if(typeof growthLog==='function')growthLog(`${roll.ability} permanent die advanced from d${priorDie} to d${next} after a natural maximum.`, '', 0);
+                }
+              }else growthNote=`Growth automatically marked: ${before}/3 → ${a.growth}/3.`;
+            }
+          }else growthNote='Boost resolved regardless of success; Storyteller excluded this check from saved temporary die and Growth advancement.';
+        }else if(critical==='Critical Error'){
+          state.character.tokens++;
+          a.growth=Math.max(0,before-1);
+          growthNote=`Critical Error: +1 Character Token, Growth ${before}/3 → ${a.growth}/3. Storyteller applies a serious complication.`;
+        }
+        const start=`${roll.kept} + ${roll.core} Core + ${roll.dots} Dots + ${roll.bonus} Technique${tokens?` + ${tokens} Tokens`:''}`;
+        const chainHTML=boostDice.length?`<div class="roll-chain"><b>Critical Boost chain:</b>${boostDice.map(x=>`<span class="roll-dice-chip">d${x.die}: ${x.face}</span>`).join('<span>+</span>')}</div>`:'';
+        const saturated=boostDice.length>=100&&boostDice.at(-1)?.face===boostDice.at(-1)?.die;
+        const criticalBanner=critical?`<span class="roll-crit-label">${critical==='Critical Boost'?'✦ CRITICAL BOOST':'CRITICAL ERROR'}</span>`:'';
+        rollResult.className='result '+(success?'':'fail');
+        rollResult.innerHTML=`<div class="roll-final-result ${success?'':'fail'}">${criticalBanner}<div><strong>${total}</strong> · <b>${success?'SUCCESS':'FAILURE'}</b></div><div class="roll-result-breakdown">${start}${bonusTotal?` + ${bonusTotal} Boost`:''} = <b>${total}</b> vs TN ${roll.difficulty}</div>${roll.tag?.valid?`<p><b>Tag interaction:</b> ${esc(roll.tag.source)} affects ${esc(roll.tag.target)} (${esc(roll.tag.reason)}). Edge applied before the roll.${interactionDamage?' <b>+1 damage</b> on this successful damaging hit.':' No +1 damage unless the action hits and harms.'}</p>`:''}${chainHTML}${saturated?'<p>Unusually long chain reached the display safety limit; review with the Storyteller.</p>':''}${currentNote?`<p><b>${esc(currentNote)}</b></p>`:''}${growthNote?`<p><b>${esc(growthNote)}</b></p>`:''}<div class="roll-delta-note">Token pool: ${available} → ${state.character.tokens} CT${tokens?` (spent ${tokens})`:''}${critical==='Critical Error'?' (includes 1 CT awarded from Critical Error)':''}</div></div>`;
+        pendingAbilityRoll=null;
+        rollStartButton.textContent='ROLL AGAIN';
+        save(false);
+        renderCharacter();renderRoster();
+        if(typeof renderGrowth==='function')renderGrowth();
+        mpPublishRoll({ability:roll.ability,stat:roll.stat,die:`d${roll.die}`,dice:roll.dice,kept:roll.kept,dots:roll.dots,core:roll.core,bonus:roll.bonus,difficulty:roll.difficulty,edge:roll.edge,tokensSpent:tokens,boostDice,boostTotal:bonusTotal,tagInteraction:roll.tag?.valid?roll.tag:null,tagDamageBonus:interactionDamage,preBoost:roll.baseTotal+tokens,total,success,natural:critical,growthBefore:before,growthAfter:+a.growth||0,currentDieBefore:priorCurrent,currentDieAfter:abilityCurrentDie(roll.ability),permanentDieBefore:priorDie,permanentDieAfter:abilityPermanentDie(roll.ability)});
       }
 
       function resolveClique(key){
@@ -5393,7 +5601,7 @@
       function characterStarterTechniqueObject(name){return characterStarterTechniques().find(x=>x.name===name)||null;}
       function characterStarterTechniqueChange(value){if(value==="__custom__")return openCustomBuilder("technique","characterBuilder");state.creation.character.starterTechnique=value;save(false);renderCharacterBuilder();}
       function toggleStartingEquipment(key,on){const d=state.creation.character;d.startingEquipmentKeys ||= [];if(on){if(d.startingEquipmentKeys.includes(key))return;if(d.startingEquipmentKeys.length>=2)return alert("A starting Character may have up to 2 Common Rank 1 Equipment items.");d.startingEquipmentKeys.push(key);}else d.startingEquipmentKeys=d.startingEquipmentKeys.filter(x=>x!==key);renderCharacterBuilder();save(false);}
-      function characterDraftErrors(){const d=state.creation.character,errs=[],c=resolveClique(d.clique),b=resolveBackground(d.background);d.startingEquipmentKeys ||= [];if(!d.name.trim())errs.push("Name is required.");if(!d.concept.trim())errs.push("Concept is required.");if(!c)errs.push("Choose a valid printed or saved Clique.");else if(!c.edge.includes(d.edgeAbility))errs.push("Choose the Edge Ability supplied by the selected Clique.");if(!b)errs.push("Choose a valid printed or saved Background.");for(const a of allAbilities)if(!Number.isInteger(+d.dots[a])||+d.dots[a]<0||+d.dots[a]>2)errs.push(`${a} has ${d.dots[a]} Dots; starting Dots must be whole numbers from 0 to 2.`);for(const stat of ["Body","Mind","Spirit"]){const used=draftBudgetUsed(d,stat),cap=priorityBudget(d,stat);if(used!==cap)errs.push(`${stat} allocation is ${used}/${cap}; starting creation must spend exactly the 5/3/1 budget.`);}if(new Set([d.primary,d.secondary,draftTertiary(d)]).size!==3)errs.push("Core Stat priority must assign a different stat to Primary, Secondary, and Tertiary.");const tags=d.tags.map(x=>x.trim()).filter(Boolean);if(tags.length!==3)errs.push("Choose exactly 3 descriptive Character Tags.");const t=characterStarterTechniqueObject(d.starterTechnique);if(!t)errs.push("Choose one starting Rank 1 Technique.");else if((+d.dots[t.ability]||0)<1)errs.push(`${t.name} is governed by ${t.ability}; the Character needs at least 1 Dot there.`);if(d.startingEquipmentKeys.length>2)errs.push("Starting Equipment exceeds the maximum of 2 items.");for(const key of d.startingEquipmentKeys){const e=starterEquipmentFromKey(key);if(!e)errs.push("One selected starting Equipment item is no longer available; reselect it.");else if(+e.rank!==1||e.availability!=="Common")errs.push(`${e.name} is not Common Rank 1 and cannot be free starting Equipment.`);}return errs;}
+      function characterDraftErrors(){const d=state.creation.character,errs=[],c=resolveClique(d.clique),b=resolveBackground(d.background);d.startingEquipmentKeys ||= [];if(!d.name.trim())errs.push("Name is required.");if(!d.concept.trim())errs.push("Concept is required.");if(!c)errs.push("Choose a valid printed or saved Clique.");else if(!c.edge.includes(d.edgeAbility))errs.push("Choose the Edge Ability supplied by the selected Clique.");if(!b)errs.push("Choose a valid printed or saved Background.");for(const a of allAbilities)if(!Number.isInteger(+d.dots[a])||+d.dots[a]<0||+d.dots[a]>2)errs.push(`${a} has ${d.dots[a]} Dots; starting Dots must be whole numbers from 0 to 2.`);for(const stat of ["Body","Mind","Spirit"]){const used=draftBudgetUsed(d,stat),cap=priorityBudget(d,stat);if(used!==cap)errs.push(`${stat} allocation is ${used}/${cap}; starting creation must spend exactly the 5/3/1 budget.`);}if(new Set([d.primary,d.secondary,draftTertiary(d)]).size!==3)errs.push("Core Stat priority must assign a different stat to Primary, Secondary, and Tertiary.");const tags=d.tags.map(x=>x.trim()).filter(Boolean);if(tags.length!==3)errs.push("Choose exactly 3 descriptive Character Tags.");const t=characterStarterTechniqueObject(d.starterTechnique);if(!t)errs.push("Choose one starting Rank 1 Technique.");else if(rcTechniqueTagErrors(t.tags).length)errs.push("Starting Technique must have exactly 3 distinct one-word Tags.");else if((+d.dots[t.ability]||0)<1)errs.push(`${t.name} is governed by ${t.ability}; the Character needs at least 1 Dot there.`);if(d.startingEquipmentKeys.length>2)errs.push("Starting Equipment exceeds the maximum of 2 items.");for(const key of d.startingEquipmentKeys){const e=starterEquipmentFromKey(key);if(!e)errs.push("One selected starting Equipment item is no longer available; reselect it.");else if(+e.rank!==1||e.availability!=="Common")errs.push(`${e.name} is not Common Rank 1 and cannot be free starting Equipment.`);}return errs;}
       function renderCharacterBuilder(){
         const el=document.getElementById("characterBuilder");if(!el)return;const d=state.creation.character,c=resolveClique(d.clique)||resolveClique("Nerd"),b=resolveBackground(d.background)||resolveBackground("Medic"),stats=draftStats(d),health=draftHealth(d,stats),errs=characterDraftErrors();d.startingEquipmentKeys ||= [];
         const statOptions=(sel)=>["Body","Mind","Spirit"].map(x=>`<option ${x===sel?"selected":""}>${x}</option>`).join("");
@@ -5413,7 +5621,7 @@
         const errs=characterDraftErrors();if(errs.length)return alert(errs.join("\n"));
         if(!asNew&&state.character?.buildStatus==="complete"&&!confirm("REBUILD THIS COMPLETED CHARACTER?\n\nApplying a fresh starting build replaces existing permanent stats, earned dice, techniques, Equipment, Signature Moves, advancement and current play marks. This cannot be undone without a JSON backup.\n\nChoose CANCEL to keep the current character, or choose Create as New Roster Character to retain the original."))return;
         const d=state.creation.character,c=resolveClique(d.clique),b=resolveBackground(d.background),stats=draftStats(d),health=draftHealth(d,stats),abilities=blankAbilities();
-        for(const a of allAbilities){abilities[a].dots=+d.dots[a]||0;abilities[a].permanentDie=b.d8===a?8:b.d6.includes(a)?6:4;abilities[a].die=abilities[a].permanentDie;}
+        for(const a of allAbilities){abilities[a].dots=+d.dots[a]||0;abilities[a].permanentDie=b.d8===a?8:b.d6.includes(a)?6:4;abilities[a].currentDie=abilities[a].permanentDie;abilities[a].die=abilities[a].permanentDie;}
         const starter=structuredClone(characterStarterTechniqueObject(d.starterTechnique));starter.id=starter.id||makeId();starter.uses=1;starter.usesRemaining=1;starter.bonus=techniqueBonus(starter);
         const startingGear=(d.startingEquipmentKeys||[]).map(starterEquipmentFromKey).filter(Boolean).map(x=>{const max=equipmentRank[+x.rank]?.uses??x.uses??1;return {...x,id:makeId(),_instanceId:makeId(),uses:max,usesRemaining:max,state:"Fine",tags:Array.isArray(x.tags)?x.tags:String(x.tags||"").split(",").map(v=>v.trim()).filter(Boolean)};});
         const sharedTokens=state.character.tokens;
@@ -5430,7 +5638,7 @@
       }
       function renderTechniqueBuilder(){
         const el=document.getElementById("techniqueBuilder");if(!el)return;normalizeTechniqueDraft();const d=state.creation.technique,errs=techniqueDraftErrors(),warns=techniqueDraftWarnings(),purchase=techniquePurchaseInfo(),bonus=techniqueBonus(d),tags=d.tags.split(",").map(x=>x.trim()).filter(Boolean);
-        el.innerHTML=`<div class="builder-help"><b>Technique grammar:</b> Category says where it comes from; Type/Subtype says what the rules do; Rank sets Uses and scale. Rank cannot exceed a Character's Governing Ability Dots. Uses equal Rank. Rank 5 needs Mastery.</div><div class="builder-section"><h3>Technique Builder</h3><div class="builder-grid three"><label>Name<input value="${esc(d.name)}" onchange="state.creation.technique.name=this.value;save(false);renderTechniqueBuilder()"></label><label>Owner<select onchange="state.creation.technique.owner=this.value;save(false);renderTechniqueBuilder()"><option ${d.owner==="Character"?"selected":""}>Character</option><option ${d.owner==="Threat"?"selected":""}>Threat</option></select></label>${d.owner==="Threat"?`<label>Threat Rating<select onchange="state.creation.technique.threatRating=+this.value;save(false);renderTechniqueBuilder()">${[1,2,3,4,5,6,7].map(x=>`<option ${+d.threatRating===x?"selected":""}>${x}</option>`).join("")}</select></label>`:""}<label>Category<select onchange="state.creation.technique.category=this.value;save(false);renderTechniqueBuilder()">${["Training","Spell","Prayer","Talent","Gadget"].map(x=>`<option ${x===d.category?"selected":""}>${x}</option>`).join("")}</select></label><label>Type<select onchange="state.creation.technique.type=this.value;normalizeTechniqueDraft();save(false);renderTechniqueBuilder()">${Object.keys(techniqueSubtypes).map(x=>`<option ${x===d.type?"selected":""}>${x}</option>`).join("")}</select></label><label>Subtype<select onchange="state.creation.technique.subtype=this.value;save(false);renderTechniqueBuilder()">${techniqueSubtypes[d.type].map(x=>`<option ${x===d.subtype?"selected":""}>${x}</option>`).join("")}</select></label><label>Rank<select onchange="state.creation.technique.rank=+this.value;save(false);renderTechniqueBuilder()">${[1,2,3,4,5].map(x=>`<option ${+d.rank===x?"selected":""}>${x}</option>`).join("")}</select></label><label>Arena<select onchange="state.creation.technique.arena=this.value;save(false);renderTechniqueBuilder()">${["Physical","Mental","Spiritual"].map(x=>`<option ${x===d.arena?"selected":""}>${x}</option>`).join("")}</select></label><label>Governing Ability<select onchange="state.creation.technique.ability=this.value;save(false);renderTechniqueBuilder()">${allAbilities.map(x=>`<option ${x===d.ability?"selected":""} value="${x}">${x}${d.owner==="Character"?` (${state.character.abilities[x]?.dots||0} Dots)`:""}</option>`).join("")}</select></label><label>Range<select onchange="state.creation.technique.range=this.value;save(false);renderTechniqueBuilder()">${["Self","Touch","Melee","Short","Standard","Long"].map(x=>`<option ${x===d.range?"selected":""}>${x}</option>`).join("")}</select></label><label>Tags, comma-separated<input value="${esc(d.tags)}" onchange="state.creation.technique.tags=this.value;save(false);renderTechniqueBuilder()"></label></div>${d.range==="Long"?`<label>Long Range justification<input value="${esc(d.longJustification)}" onchange="state.creation.technique.longJustification=this.value;save(false);renderTechniqueBuilder()"></label>`:""}<label>Description<textarea rows="4" onchange="state.creation.technique.description=this.value;save(false);renderTechniqueBuilder()">${esc(d.description)}</textarea></label>${+d.rank===5?`<label>Mastery Boon<textarea rows="3" onchange="state.creation.technique.mastery=this.value;save(false);renderTechniqueBuilder()">${esc(d.mastery)}</textarea></label>`:""}<div class="derived-card"><b>${esc(d.category)} / ${esc(d.subtype)} Rank ${d.rank}</b><br>Uses: <b>${d.rank}</b> · Technique Bonus: <b>+${bonus}</b> · Arena: ${d.arena}<br><span class="inline-note">${esc(subtypeNotes[d.subtype])}</span>${tags.length?`<br>${tags.map(x=>`<span class="rule-pill">${esc(x)}</span>`).join("")}`:""}</div>${d.owner==="Character"?`<div class="builder-help"><label class="toggle"><input type="checkbox" ${state.advancement.firstMissionResolved?"checked":""} onchange="state.advancement.firstMissionResolved=this.checked;save(false);renderTechniqueBuilder()"> Player has completed their first Mission Resolution</label><br><small>This explicit campaign flag is needed because Studio does not infer Mission Resolution from Scene activity. It controls whether permanent Character Token advancement is legal.</small></div>`:""}<div class="validation">${errs.length?errs.map(x=>`<div class="err">✕ ${esc(x)}</div>`).join(""):`<div class="ok">✓ Technique construction has no blocking rules errors.</div>`}${warns.map(x=>`<div class="warn">⚠ ${esc(x)}</div>`).join("")}${d.owner==="Character"?purchase.issues.map(x=>`<div class="err">✕ ${esc(x)}</div>`).join(""):""}</div><div class="mini-actions"><button class="primary" onclick="saveTechniqueToLibrary()" ${errs.length?"disabled":""}>Save Design to Library</button>${d.owner==="Character"?`<button class="primary" onclick="addTechniqueToCharacter()" ${(errs.length||purchase.issues.length)?"disabled":""}>${esc(purchase.label)}</button>`:""}<button onclick="state.creation.technique=newTechniqueDraft();renderTechniqueBuilder();save(false)">Clear</button></div></div><div class="builder-section"><h3>Rulebook Rank 1 Examples</h3><label>Filter by Governing Ability<select onchange="setTechniqueExampleAbility(this.value)"><option value="All">All 24 Abilities</option>${allAbilities.map(a=>`<option value="${esc(a)}" ${techniqueAbilityFilter===a?"selected":""}>${esc(a)} (${techniqueExamples.filter(t=>t.ability===a).length})</option>`).join("")}</select></label><div class="example-grid">${techniqueExamples.map((t,i)=>({t,i})).filter(x=>techniqueAbilityFilter==='All'||x.t.ability===techniqueAbilityFilter).map(({t,i})=>`<div class="example-card"><h4>${esc(t.name)}</h4><p>${t.category} / ${t.subtype} · ${t.arena}<br>${t.ability} · ${t.range}</p><p>${esc(t.description)}</p><button class="btn" onclick="loadTechniqueExample(${i})">Load</button></div>`).join("")}</div></div>`;
+        el.innerHTML=`<div class="builder-help"><b>Technique grammar:</b> Category says where it comes from; Type/Subtype says what the rules do; Rank sets Uses and scale. <b>Every Technique must have exactly 3 distinct, one-word Tags.</b> Describe how a Tag acts on another Tag for Edge and +1 damage when a hit deals harm. Rank cannot exceed a Character's Governing Ability Dots. Uses equal Rank. Rank 5 needs Mastery.</div><div class="builder-section"><h3>Technique Builder</h3><div class="builder-grid three"><label>Name<input value="${esc(d.name)}" onchange="state.creation.technique.name=this.value;save(false);renderTechniqueBuilder()"></label><label>Owner<select onchange="state.creation.technique.owner=this.value;save(false);renderTechniqueBuilder()"><option ${d.owner==="Character"?"selected":""}>Character</option><option ${d.owner==="Threat"?"selected":""}>Threat</option></select></label>${d.owner==="Threat"?`<label>Threat Rating<select onchange="state.creation.technique.threatRating=+this.value;save(false);renderTechniqueBuilder()">${[1,2,3,4,5,6,7].map(x=>`<option ${+d.threatRating===x?"selected":""}>${x}</option>`).join("")}</select></label>`:""}<label>Category<select onchange="state.creation.technique.category=this.value;save(false);renderTechniqueBuilder()">${["Training","Spell","Prayer","Talent","Gadget"].map(x=>`<option ${x===d.category?"selected":""}>${x}</option>`).join("")}</select></label><label>Type<select onchange="state.creation.technique.type=this.value;normalizeTechniqueDraft();save(false);renderTechniqueBuilder()">${Object.keys(techniqueSubtypes).map(x=>`<option ${x===d.type?"selected":""}>${x}</option>`).join("")}</select></label><label>Subtype<select onchange="state.creation.technique.subtype=this.value;save(false);renderTechniqueBuilder()">${techniqueSubtypes[d.type].map(x=>`<option ${x===d.subtype?"selected":""}>${x}</option>`).join("")}</select></label><label>Rank<select onchange="state.creation.technique.rank=+this.value;save(false);renderTechniqueBuilder()">${[1,2,3,4,5].map(x=>`<option ${+d.rank===x?"selected":""}>${x}</option>`).join("")}</select></label><label>Arena<select onchange="state.creation.technique.arena=this.value;save(false);renderTechniqueBuilder()">${["Physical","Mental","Spiritual"].map(x=>`<option ${x===d.arena?"selected":""}>${x}</option>`).join("")}</select></label><label>Governing Ability<select onchange="state.creation.technique.ability=this.value;save(false);renderTechniqueBuilder()">${allAbilities.map(x=>`<option ${x===d.ability?"selected":""} value="${x}">${x}${d.owner==="Character"?` (${state.character.abilities[x]?.dots||0} Dots)`:""}</option>`).join("")}</select></label><label>Range<select onchange="state.creation.technique.range=this.value;save(false);renderTechniqueBuilder()">${["Self","Touch","Melee","Short","Standard","Long"].map(x=>`<option ${x===d.range?"selected":""}>${x}</option>`).join("")}</select></label><label>Tags, comma-separated<input value="${esc(d.tags)}" onchange="state.creation.technique.tags=this.value;save(false);renderTechniqueBuilder()"></label></div>${d.range==="Long"?`<label>Long Range justification<input value="${esc(d.longJustification)}" onchange="state.creation.technique.longJustification=this.value;save(false);renderTechniqueBuilder()"></label>`:""}<label>Description<textarea rows="4" onchange="state.creation.technique.description=this.value;save(false);renderTechniqueBuilder()">${esc(d.description)}</textarea></label>${+d.rank===5?`<label>Mastery Boon<textarea rows="3" onchange="state.creation.technique.mastery=this.value;save(false);renderTechniqueBuilder()">${esc(d.mastery)}</textarea></label>`:""}<div class="derived-card"><b>${esc(d.category)} / ${esc(d.subtype)} Rank ${d.rank}</b><br>Uses: <b>${d.rank}</b> · Technique Bonus: <b>+${bonus}</b> · Arena: ${d.arena}<br><span class="inline-note">${esc(subtypeNotes[d.subtype])}</span>${tags.length?`<br>${tags.map(x=>`<span class="rule-pill">${esc(x)}</span>`).join("")}`:""}</div>${d.owner==="Character"?`<div class="builder-help"><label class="toggle"><input type="checkbox" ${state.advancement.firstMissionResolved?"checked":""} onchange="state.advancement.firstMissionResolved=this.checked;save(false);renderTechniqueBuilder()"> Player has completed their first Mission Resolution</label><br><small>This explicit campaign flag is needed because Studio does not infer Mission Resolution from Scene activity. It controls whether permanent Character Token advancement is legal.</small></div>`:""}<div class="validation">${errs.length?errs.map(x=>`<div class="err">✕ ${esc(x)}</div>`).join(""):`<div class="ok">✓ Technique construction has no blocking rules errors.</div>`}${warns.map(x=>`<div class="warn">⚠ ${esc(x)}</div>`).join("")}${d.owner==="Character"?purchase.issues.map(x=>`<div class="err">✕ ${esc(x)}</div>`).join(""):""}</div><div class="mini-actions"><button class="primary" onclick="saveTechniqueToLibrary()" ${errs.length?"disabled":""}>Save Design to Library</button>${d.owner==="Character"?`<button class="primary" onclick="addTechniqueToCharacter()" ${(errs.length||purchase.issues.length)?"disabled":""}>${esc(purchase.label)}</button>`:""}<button onclick="state.creation.technique=newTechniqueDraft();renderTechniqueBuilder();save(false)">Clear</button></div></div><div class="builder-section"><h3>Rulebook Rank 1 Examples</h3><label>Filter by Governing Ability<select onchange="setTechniqueExampleAbility(this.value)"><option value="All">All 24 Abilities</option>${allAbilities.map(a=>`<option value="${esc(a)}" ${techniqueAbilityFilter===a?"selected":""}>${esc(a)} (${techniqueExamples.filter(t=>t.ability===a).length})</option>`).join("")}</select></label><div class="example-grid">${techniqueExamples.map((t,i)=>({t,i})).filter(x=>techniqueAbilityFilter==='All'||x.t.ability===techniqueAbilityFilter).map(({t,i})=>`<div class="example-card"><h4>${esc(t.name)}</h4><p>${t.category} / ${t.subtype} · ${t.arena}<br>${t.ability} · ${t.range}</p><p>${esc(t.description)}</p><button class="btn" onclick="loadTechniqueExample(${i})">Load</button></div>`).join("")}</div></div>`;
       }
       function loadCharacterExample(i){const x=characterExamples[i],d=newCharacterDraft();d.name=x.name;d.concept=x.concept;d.clique=x.clique;d.edgeAbility=resolveClique(x.clique)?.edge?.[0]||"";d.background=x.background;d.tags=[...x.tags];d.starterTechnique=x.technique;state.creation.character=d;renderCharacterBuilder();save(false);}
       function cliqueDraftErrors(){
@@ -5460,8 +5668,8 @@
       }
 
       function techniqueBonus(t){const r=+t.rank||1;return t.subtype==="Beam"?beamBonus[r]:(["Cloud","Shelter"].includes(t.subtype)?cloudBonus[r]:standardBonus[r]);}
-      function techniqueDraftErrors(){const d=state.creation.technique,errs=[];if(!d.name.trim())errs.push("Technique needs a name.");if(!d.description.trim())errs.push("Write the Technique's method/effect in the Description.");if(!d.ability)errs.push("Choose a Governing Ability.");if(d.range==="Long"&&!d.longJustification.trim())errs.push("Long Range requires an underlying Long-range method, specific rule, Mastery, or Miracle justification.");if(+d.rank===5&&!d.mastery.trim())errs.push("Rank 5 requires a Mastery Boon.");if(d.owner==="Character"&&(+state.character.abilities[d.ability]?.dots||0)<+d.rank)errs.push(`Rank ${d.rank} exceeds ${d.ability} Dots (${state.character.abilities[d.ability]?.dots||0}).`);if(d.owner==="Threat"&&+d.rank>threatRatings[+d.threatRating].cap)errs.push(`Rating ${d.threatRating} Threats cap Techniques at Rank ${threatRatings[+d.threatRating].cap}.`);return errs;}
-      function techniqueDraftWarnings(){const d=state.creation.technique,w=[];const tags=d.tags.split(",").map(x=>x.trim()).filter(Boolean);if(tags.length<2||tags.length>4)w.push("Two to four useful Tags is usually enough. This build is still legal, but review whether its Tags clearly describe nature, counters, and interactions.");if(+d.rank>1&&!d.id)w.push("New Techniques normally begin at Rank 1. Higher Rank is appropriate only when upgrading an owned Technique or when the Storyteller is intentionally authoring a non-starting entry.");return w;}
+      function techniqueDraftErrors(){const d=state.creation.technique,errs=[];if(!d.name.trim())errs.push("Technique needs a name.");if(!d.description.trim())errs.push("Write the Technique's method/effect in the Description.");errs.push(...rcTechniqueTagErrors(d.tags));if(!d.ability)errs.push("Choose a Governing Ability.");if(d.range==="Long"&&!d.longJustification.trim())errs.push("Long Range requires an underlying Long-range method, specific rule, Mastery, or Miracle justification.");if(+d.rank===5&&!d.mastery.trim())errs.push("Rank 5 requires a Mastery Boon.");if(d.owner==="Character"&&(+state.character.abilities[d.ability]?.dots||0)<+d.rank)errs.push(`Rank ${d.rank} exceeds ${d.ability} Dots (${state.character.abilities[d.ability]?.dots||0}).`);if(d.owner==="Threat"&&+d.rank>threatRatings[+d.threatRating].cap)errs.push(`Rating ${d.threatRating} Threats cap Techniques at Rank ${threatRatings[+d.threatRating].cap}.`);return errs;}
+      function techniqueDraftWarnings(){const d=state.creation.technique,w=[];const tags=d.tags.split(",").map(x=>x.trim()).filter(Boolean);if(+d.rank>1&&!d.id)w.push("New Techniques normally begin at Rank 1. Higher Rank is appropriate only when upgrading an owned Technique or when the Storyteller is intentionally authoring a non-starting entry.");return w;}
       function ownedTechniqueForDraft(d=state.creation.technique){return state.character.techniques.find(x=>x&&typeof x==="object"&&((d.id&&x.id===d.id)||(!d.id&&d.name.trim()&&String(x.name||"").toLowerCase()===d.name.trim().toLowerCase())));}
       function techniquePurchaseInfo(){const d=state.creation.technique,existing=ownedTechniqueForDraft(d);if(d.owner!=="Character")return {existing:null,cost:0,issues:[],label:""};const issues=[];let cost=0,label="";if(!existing){if(+d.rank!==1)issues.push("A new Character Technique must be purchased at Rank 1; later Ranks are bought one at a time.");cost=techniqueRankCost[1];label=`Buy Rank 1 · ${cost} CT`;}else if(+d.rank===+existing.rank){label="Update owned entry · 0 CT";}else if(+d.rank===+existing.rank+1){cost=techniqueRankCost[+d.rank];label=`Upgrade R${existing.rank} → R${d.rank} · ${cost} CT`;}else if(+d.rank>+existing.rank+1){issues.push(`Cannot skip Technique Ranks. ${existing.name} is Rank ${existing.rank}; next legal purchase is Rank ${+existing.rank+1}.`);label="Rank skip blocked";}else{issues.push(`The builder cannot downgrade an owned Technique from Rank ${existing.rank} to Rank ${d.rank}.`);label="Downgrade blocked";}if(cost>0&&!state.advancement.firstMissionResolved)issues.push("Permanent advancement is locked until after this player's first Mission Resolution. Starting 10 CT may still be used on roll effects before then.");if(cost>+state.character.tokens)issues.push(`This purchase costs ${cost} Character Tokens; the shared player pool has ${state.character.tokens}.`);return {existing,cost,issues,label};}
       function normalizeTechniqueDraft(){const d=state.creation.technique;if(!techniqueSubtypes[d.type].includes(d.subtype))d.subtype=techniqueSubtypes[d.type][0];}
@@ -5475,7 +5683,7 @@
       function addTechniqueToCharacter(){const errs=techniqueDraftErrors(),purchase=techniquePurchaseInfo();if(errs.length||purchase.issues.length)return alert([...errs,...purchase.issues].join("\n"));const t=techniqueObjectFromDraft();if(purchase.existing){t.id=purchase.existing.id;t.usesRemaining=techniqueUsesRemaining(purchase.existing);}else t.usesRemaining=+t.rank||1;let i=state.character.techniques.findIndex(x=>x&&typeof x==="object"&&x.id===t.id);if(i<0)i=state.character.techniques.findIndex(x=>!x);if(purchase.cost>0){state.character.tokens-=purchase.cost;growthLog(`${purchase.existing?`Upgraded ${t.name} to Rank ${t.rank}`:`Learned ${t.name} at Rank ${t.rank}`}.`,"CT",-purchase.cost);}if(i>=0)state.character.techniques[i]=t;else state.character.techniques.push(t);state.creation.technique.id=t.id;const design={...structuredClone(t)};delete design.usesRemaining;const li=state.library.techniques.findIndex(x=>x.id===t.id);if(li>=0)state.library.techniques[li]=design;else state.library.techniques.push(design);renderCharacter();renderRoster();renderTechniqueBuilder();renderCreationLibrary();save(false);customCreationComplete("technique",t.id,true);}
 
       function derivedThreat(d){const r=threatRatings[+d.rating],statNames=[d.strongStat,["Body","Mind","Spirit"].find(x=>x!==d.strongStat&&x!==d.weakStat),d.weakStat],arenaNames=[d.strongArena,["Physical","Mental","Spiritual"].find(x=>x!==d.strongArena&&x!==d.weakArena),d.weakArena],stats={},dice={};statNames.forEach((n,i)=>stats[n]=r.stats[i]);arenaNames.forEach((n,i)=>dice[n]=r.dice[i]);const health={Body:Math.max(3,5+stats.Body+(+d.rating)),Mind:Math.max(3,5+stats.Mind+(+d.rating)),Spirit:Math.max(3,5+stats.Spirit+(+d.rating))};return {r,stats,dice,health};}
-      function threatErrors(){const d=state.creation.threat,{r}=derivedThreat(d),errs=[];if(!d.name.trim())errs.push("Threat needs a name.");if(!d.goal.trim())errs.push("Threat needs a Goal.");if(d.strongStat===d.weakStat)errs.push("Strongest and weakest Core Stats must differ.");if(d.strongArena===d.weakArena)errs.push("Strongest and weakest Arenas must differ.");for(const id of d.techniqueIds){const t=state.library.techniques.find(x=>x.id===id);if(t&&+t.rank>r.cap)errs.push(`${t.name} is Rank ${t.rank}; Rating ${d.rating} Threat cap is ${r.cap}.`);}return errs;}
+      function threatErrors(){const d=state.creation.threat,{r}=derivedThreat(d),errs=[];if(!d.name.trim())errs.push("Threat needs a name.");if(!d.goal.trim())errs.push("Threat needs a Goal.");if(d.strongStat===d.weakStat)errs.push("Strongest and weakest Core Stats must differ.");if(d.strongArena===d.weakArena)errs.push("Strongest and weakest Arenas must differ.");for(const id of d.techniqueIds){const t=state.library.techniques.find(x=>x.id===id);if(t&&rcTechniqueTagErrors(t.tags).length)errs.push(`${t.name} must have exactly 3 distinct one-word Technique Tags.`);if(t&&+t.rank>r.cap)errs.push(`${t.name} is Rank ${t.rank}; Rating ${d.rating} Threat cap is ${r.cap}.`);}return errs;}
       function threatWarnings(){const d=state.creation.threat,w=[];if(!d.tell.trim())w.push("Add a Tell so players can read the Threat and respond to its pressure.");if(!d.pressure.trim())w.push("Add Pressure Behavior or escape logic so the Threat has a clear play pattern.");if(+d.rating>=3&&!d.vulnerability.trim())w.push("Serious Threats benefit from meaningful Vulnerability or Counterplay rather than extra Health alone.");if(d.shape==="Boss"&&d.bossFeatures.length<3)w.push("Boss guidance recommends at least three distinct Boss-design features so the Scene does not collapse into focus-fire.");return w;}
       function setThreatField(field,value){const d=state.creation.threat;if(["rating"].includes(field))value=+value;d[field]=value;if(field==="strongStat"&&d.weakStat===value)d.weakStat=["Body","Mind","Spirit"].find(x=>x!==value);if(field==="weakStat"&&d.strongStat===value)d.strongStat=["Body","Mind","Spirit"].find(x=>x!==value);if(field==="strongArena"&&d.weakArena===value)d.weakArena=["Physical","Mental","Spiritual"].find(x=>x!==value);if(field==="weakArena"&&d.strongArena===value)d.strongArena=["Physical","Mental","Spiritual"].find(x=>x!==value);renderThreatBuilder();save(false);}
       function toggleThreatFeature(v,on){const a=state.creation.threat.bossFeatures;a.splice(0,a.length,...(on?[...new Set([...a,v])]:a.filter(x=>x!==v)));renderThreatBuilder();save(false);}
@@ -5896,7 +6104,7 @@
         technique:{title:"Techniques",use:"Techniques are consequential special moves such as training, spells, prayers, talents, or gadgets.",play:"Rank sets both strength and Uses. Spending a Use crosses off one Technique Dot until recovery. A Technique Check still uses the governing Ability; Rank cannot exceed the governing Ability Dots."},
         edge:{title:"Edge",use:"Edge represents a meaningful advantage. Negative Edge represents a meaningful disadvantage.",play:"Cancel Edge and Negative Edge one-for-one. If Edge remains, roll twice and keep the higher result. If Negative Edge remains, roll twice and keep the lower result."},
         damage:{title:"Damage & Health",use:"Body, Mind, and Spirit each have their own Health Track and can be attacked independently.",play:"Damage equals the acting result minus the resisting result. Apply Shield, then Temporary Health, then the relevant Health Track. At 0, that Track is Broken and checks governed by it use only the raw Ability Die."},
-        growth:{title:"Growth",use:"Growth boxes track advancement pressure earned through meaningful play.",play:"A natural maximum that succeeds rolls the next die and marks one Growth box after a meaningful check. A natural minimum that fails causes a complication, grants 1 Character Token, and removes one Growth box."}
+        growth:{title:"Growth",use:"Growth boxes track advancement pressure earned through meaningful play.",play:"A natural maximum rolls the next die immediately, before success is known, and raises the temporary Current Die and marks Growth on a meaningful check even when the final check fails. A natural minimum that fails causes a complication, grants 1 Character Token, and removes one Growth box."}
       };
       const EXPLICIT_GUIDANCE = {
         abilities:{title:"Abilities",use:"Abilities are the trained competencies used for checks. Each Ability has its own die and 0–5 Dots.",play:"When you act, choose the Ability that matches what your Character is doing. Roll its Ability Die, add the Core Stat that matches the pressure, then add that Ability's Dots. A relevant Technique can add its Technique Bonus."},
@@ -5922,10 +6130,10 @@
         {re:/^token trigger$|clique token trigger/i,title:"Clique Token Trigger",use:"The Token Trigger is the downside pressure built into a Clique. It names a recurring archetypal habit, reputation, or tendency that can make the situation genuinely harder.",play:"Once per Mission, when that Trigger creates a meaningful complication and you accept the complication instead of dodging or negating it, gain 1 Character Token. A harmless quirk that causes no trouble does not qualify."},
         {re:/1\/mission clique feature|once-per-mission clique feature|clique feature/i,title:"Clique 1/Mission Feature",use:"Every Clique supplies one modest special feature usable once per Mission. It is separate from the Clique Token Trigger and separate from the Background Perk.",play:"Use it when its fictional condition applies. It may reveal a narrow fact, sense pressure, create a small opening, shift attention, grant narrow resistance, protect someone, or modestly change position. It cannot act like a full Technique, deal direct damage, grant extra actions, restore Health/Uses, or create permanent Equipment/Assets."},
         {re:/background perk|once-per-mission background perk|1\/mission background perk/i,title:"Background 1/Mission Perk",use:"The Background Perk is a modest benefit from concrete lived experience. It is a separate once-per-Mission resource from the Clique feature.",play:"Invoke it once per Mission when the Character’s specific experience is relevant. Custom Perks should stay no stronger than the printed Background examples."},
-        {re:/lifestyle tag/i,title:"Lifestyle Tag",use:"A Background may supply an optional Lifestyle Tag that records a durable truth about the way the Character lived, worked, trained, or moved through the world.",play:"Treat it as a Tag: it is fictional truth, not an automatic modifier. It matters when the fiction or another rule directly references it."},
+        {re:/lifestyle tag/i,title:"Lifestyle Tag",use:"A Background may supply an optional Lifestyle Tag that records a durable truth about the way the Character lived, worked, trained, or moved through the world.",play:"Treat it as a Tag: it is fictional truth that earns Edge and +1 damage when an interaction is meaningfully exploited. It matters when the fiction or another rule directly references it."},
         {re:/\bclique\b/i,title:"Clique",use:"Clique is the Character’s broad Saturday-morning archetype. It is a mechanical package, not just a personality label: it gives +1 to one Core Stat, −1 to another, a choice of Clique Edge Ability, a Token Trigger, and one once-per-Mission feature.",play:"Choose the Clique that describes how the Character tends to function in the cast, not merely their job. Clique Edge applies only when the roll clearly expresses that archetype. Once per Mission, if the Clique’s Token Trigger creates a meaningful complication and you accept it, gain 1 Character Token; use the printed once-per-Mission feature when its fictional condition is met."},
         {re:/\bbackground\b/i,title:"Background",use:"Background is the Character’s concrete lived experience before the current show. It establishes one Ability at d8, two different Abilities at d6, a modest once-per-Mission Background Perk, and optionally a lifestyle Tag; other standard Abilities begin at d4 unless improved elsewhere.",play:"Choose a Background because it explains what the Character has actually done or learned, not because it matches their Clique. Its dice become the starting Ability dice you roll in play. The Perk is narrow fictional expertise you may invoke once per Mission when its stated situation genuinely applies."},
-        {re:/\bcharacter tags?\b|\btags, comma-separated\b|^tags$/i,title:"Tags",use:"Tags are short statements of useful fictional truth: profession, culture, reputation, body, affiliation, supernatural state, lifestyle, or another quality that should remain true in play. They are not automatic +1/−1 modifiers.",play:"Write Tags that tell the table something actionable about the Character or object. A Tag matters when the fiction directly cares about it or when another rule explicitly references it, such as Expose, Inoculate, Vulnerability, Equipment, or a Technique. If nothing in the situation touches the Tag, it does not change the roll."},
+        {re:/\bcharacter tags?\b|\btags, comma-separated\b|^tags$/i,title:"Tags",use:"Tags are short statements of useful fictional truth: profession, culture, reputation, body, affiliation, supernatural state, lifestyle, or another quality that should remain true in play. An explained interaction between Tags grants Edge and, on a successful damaging hit, +1 damage.",play:"Write Tags that tell the table something actionable about the Character or object. A Tag matters whenever the player can explain a real interaction with another Tag, such as Fire affecting Ice. A justified interaction earns Edge, plus +1 damage on a successful damaging hit. Expose, Inoculate and other specific Tag rules remain in force. If nothing in the situation touches the Tag, it does not change the roll."},
         {re:/\blook\b/i,title:"Look",use:"Look records the Character’s recognizable visual presentation: clothes, silhouette, gear, physical traits, or other details the audience would immediately notice.",play:"Use it as fictional truth and recurring visual language. It normally grants no modifier by itself, but it can determine what disguises are plausible, what witnesses remember, what Equipment is visibly present, and what details return in narration or consequences."},
         {re:/\bcatchphrase\b/i,title:"Catchphrase",use:"A Catchphrase is a recurring line or verbal bit associated with the Character. It is characterization, not a passive mechanical bonus.",play:"Use it when it makes the Scene more vivid, funny, dramatic, or recognizably ‘your Character.’ If another rule specifically keys off a spoken declaration or performance, resolve that rule normally; the Catchphrase itself does not replace a check."},
         {re:/\bpronouns\b/i,title:"Pronouns",use:"Pronouns tell the table how to refer to the Character in play.",play:"Record them so narration, spotlight handoffs, notes, and table talk stay consistent. This field has no mechanical effect."},
@@ -6066,7 +6274,7 @@
         {re:/relationships?|team notes|bonds|allies|important relationships/i,title:"Relationships & Team Notes",use:"Record important people, bonds, obligations, rivalries, and recurring team context.",play:"Use these notes as story handles. They help the table remember who matters and give the Storyteller material for consequences, favors, hooks, and callbacks."},
         {re:/core stat|body$|mind$|spirit$|pressure/i,title:"Core Stats",use:"Body, Mind, and Spirit describe the kind of pressure being exerted, not three fixed lists of actions.",play:"For an Ability Check, combine the Ability Die and Ability Dots with the Core Stat that fits the pressure of the current action. Body, Mind, and Spirit also contribute to their matching Health maximums."},
         {re:/ability dots?|abilities|athletics|melee|firearms|piloting|survival|security|investigation|medicine|technology|politics|academics|finance|faith|occult|presence|deception|empathy|willpower|leadership|performance|crafting|streetwise|influence|nature/i,title:"Abilities",use:"Abilities are the trained competencies used for checks. Each has an Ability Die and 0–5 Ability Dots.",play:"A standard check is Ability Die + relevant Core Stat + Ability Dots. If a Technique applies, add its Technique Bonus. The Storyteller chooses consequences based on the result and stakes."},
-        {re:/growth/i,title:"Growth Boxes",use:"Growth boxes track advancement pressure on an Ability.",play:"A natural maximum that succeeds on a meaningful check rolls the next die and marks a Growth box. A natural minimum that fails removes one Growth box as part of the Critical Error rule."},
+        {re:/growth/i,title:"Growth Boxes",use:"Growth boxes track advancement pressure on an Ability.",play:"A natural maximum always rolls the next die before checking success; a meaningful check raises the temporary Current Die and marks Growth even if the final result fails. A natural minimum that fails removes one Growth box as part of the Critical Error rule."},
         {re:/token pool|character tokens?|current tokens|gain \/ spend|team tokens?/i,title:"Tokens",use:"Tokens are spendable advancement/effort currency, with Character Tokens and Team Tokens serving different scopes.",play:"Character Tokens can be spent after rolling but before the outcome is final for +1 each. Team Tokens fund shared Team growth, Equipment, Assets, and repairs according to their listed costs."},
         {re:/technique/i,title:"Techniques",use:"Techniques are limited-use special moves. Category says where the power comes from; Type/Subtype says what it does; Rank controls scale and Uses.",play:"Rank equals Uses. Spend a Use when the Technique is used, and recover crossed-off Dots through the recovery rules. Technique Rank cannot exceed the governing Ability Dots."},
         {re:/signature/i,title:"Signature Moves",use:"Signature Moves are iconic actions born from actual play, not moves designed in advance.",play:"When you Critical Boost a roll, you may immediately spend 5 Character Tokens to lock that exact action in if the source qualifies. Ability Signatures require 2+ Dots in the chosen Ability, and Technique Signatures require Rank 2+ in the chosen Technique. Record the action, die-pool assignment, flavor/description, and relevant circumstances. Later, the Signature applies only when that established action meaningfully recurs."},
