@@ -1,15 +1,25 @@
-# Role Credits Android Updater v0.2.4.6, QA
+# Role Credits v0.2.5.0 Unified Release: Pre-Publication QA
 
-- [x] Android XML manifest parses correctly; install permission and private APK content provider configured.
-- [x] Android Java syntax checked using JDK compiler parser (MainActivity, MobileUpdater, UpdateApkProvider): 3/3 pass.
-- [x] The game HTML is byte-for-byte identical to the previously bundled v0.2.4.5 engine; no game mechanics modified.
-- [x] Official icon and branded resources carried over unchanged.
-- [x] Signing keystore contains a long-lived RSA 3072-bit PKCS#12 private-key entry, alias `rolecredits`, verified with keytool.
-- [x] Signing material excluded from the public source ZIP and only included in the separately marked private kit.
-- [x] YAML syntax parses; versionCode 20406 and versionName 0.2.4.6 present; SDK 35 and Gradle build steps match previously successful debug configuration.
-- [x] GitHub release file naming and `.sha256` verification logic match.
-- [ ] Actual Android Java compilation and APK signing have not run in this container (no Android SDK and no network download available).
-- [ ] Android device install, backup/restore, and automatic updates require user testing after GitHub build.
-- [ ] Source cannot be pushed from this connector due GitHub 403 write restrictions. User must upload via GitHub Desktop.
+## PASS, locally verified
 
-Safety: Never uninstall the existing debug APK before exporting/confirming a valid backup and producing a signed APK. Don't upload the permanent signing key or any of its secrets to the public repository.
+- GitHub live audit established latest existing Windows-only v0.2.2.6 and Android-only v0.2.4.6 releases, and a working Android permanent signing workflow.
+- `release/VERSION` = `0.2.5.0`; Android generated versionCode expected = `20500`, greater than installed release v0.2.4.6 / 20406.
+- Root Windows game HTML is byte-identical to v0.2.4.6 Android's current embedded game HTML, including its guarded native backup bridge. Shared SHA-256: `bf1d55b8c088effa429f97acdc28622d4161105fce7aaa1cb1252893f1d27ebb`.
+- Parsed all three GitHub workflow YAML documents successfully and Bash-syntax checked each Bash execution step (`bash -n`).
+- Ran `release/check_release.py` in an assembled file fixture; success for 0.2.5.0, deliberately rejects mismatching version and game HTML.
+- Using v0.2.4.5 packaged desktop Go source with unified HTML: `go test ./...` passed.
+- Cross-compiled Windows GUI x64 PE32+ launcher with Go linker version 0.2.5.0; verified PE file and version bytes.
+- Embedded canonical branded icon in compiled Windows launcher; icon resource tree includes eight icon sizes and RT_GROUP_ICON. Resource parser verified.
+- Both signed Android secret names and filenames match proven v0.2.4.6 release pipeline; no secrets included in package.
+
+## PENDING, requires GitHub Actions and device
+
+- Test the new Android `release/VERSION`-derived Gradle configuration on the hosted Android SDK (SDK unavailable in local environment).
+- Execute `Role Credits Unified Release (Windows + Android)` workflow using the committed source and existing private GitHub Actions signing secrets.
+- Verify five published assets under one v0.2.5.0 GitHub release.
+- On existing signed Android v0.2.4.6, use the **⋮ → Check for Android updates** flow and confirm in-place upgrade with campaign persistence.
+- On Windows, test `Check for Updates` from installed desktop app and verify upgrade/icon persistence.
+
+## Known limitation
+
+Windows SHA-256 checksum protects transfer integrity but no Authenticode publisher certificate is configured. Do not describe the Windows EXE as publisher-signed. Android signed APK uses the permanent pre-existing certificate stored only in GitHub Actions secrets.

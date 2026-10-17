@@ -1,50 +1,52 @@
-# Role Credits Studio Android updater: v0.2.4.6
+# Role Credits Studio: One-Click Cross-Platform Releases
 
-## What is included
+**First coordinated release: v0.2.5.0**
 
-- Unmodified v0.2.4.5 game UI / dice engine, packaged in the v0.2.4.6 Android shell.
-- Android app version 0.2.4.6 (versionCode 20406), package `media.rolecredits.studio`.
-- In-app update button and once-daily background checks of GitHub Releases.
-- Explicit acceptance before download; SHA-256 checksum verification; APK package name, version and certificate checks; Android system installer for user authorization.
-- A private read-only content provider to hand staged APKs to Android's installer.
-- The same approved RC icon and existing campaign import/export / native portrait picker.
-- GitHub Actions: debug checks on pushes, permanently signed release on explicit manual publish.
+This is an **overlay patch** for the existing public GitHub repository `deathboundchronicles-dev/Role-Credits-`. It does not include the full game source, Android signing keys, or an APK; both platform installers will be built by GitHub Actions from the existing repository.
 
-## Before replacing your installed v0.2.4.5 debug APK
+## One-time setup
 
-1. On your phone open Role Credits Studio -> three-dot app menu -> Export campaign backup.
-2. Save the JSON file outside the app, ideally to cloud storage AND another location. Verify the file exists and is nonempty.
-3. Do NOT uninstall the debug build yet. First complete GitHub upload, configure the four private signing secrets and run the signed build successfully.
-4. Only after the signed APK appears in GitHub Releases, uninstall the debug-signed app, install the permanently signed APK, then choose Import campaign backup.
-5. Verify your saved characters, portraits, campaigns and dice settings. Keep the JSON backup safe.
+1. Using **GitHub Desktop**, open your existing Role-Credits- repository clone.
+2. Extract this archive and **copy its contents into the repository root**, preserving the `.github`, `android` and `release` directories. Replace the older files when prompted. Do not place the containing folder inside your repository.
+3. GitHub Desktop should show updates to the two existing workflows, one **new** `.github/workflows/cross-platform-release.yml`, Android Gradle config, Android MainActivity, the root game HTML, and `release/` configuration files. No signing key should appear in the changes.
+4. Commit and **Push origin** to main. Automated **Windows Checks (CI)** and **Android Checks (CI)** should run; they do **not** publish installers.
+5. Open https://github.com/deathboundchronicles-dev/Role-Credits-/actions/workflows/cross-platform-release.yml
+6. Click **Run workflow**; version `0.2.5.0`; channel `prerelease`. Run.
+7. Wait for green checks on Verify, Windows, Android, Publish. GitHub will create **one** v0.2.5.0 release with both installers and checksum files:
 
-Android cannot update an APK signed by GitHub's temporary debug signing key with one signed by a new permanent release key. The one-time uninstall is unavoidable. Subsequent Android releases MUST use the same private signing key and increment versionCode and versionName.
+   - `Role_Credits_Setup.exe` (Windows installer/updater)
+   - `Role_Credits_Setup.sha256` (Windows SHA-256)
+   - `Role_Credits.exe` (Windows alternate launcher name)
+   - `Role_Credits_Android.apk` (signed Android installer/updater)
+   - `Role_Credits_Android.sha256` (Android SHA-256)
 
-## Put updater source into GitHub
+8. On Android v0.2.4.6, use the app's top **⋮ → Check for Android updates** to verify it offers v0.2.5.0. **Do not uninstall** the permanently signed v0.2.4.6 app. The update must install over it, preserving campaign data.
+9. On Windows, use its in-app update checker or install `Role_Credits_Setup.exe`. Windows releases remain unsigned at the publisher-certificate level; ensure you download from the official GitHub release.
 
-On your Windows laptop use GitHub Desktop (recommended): open/clone
-https://github.com/deathboundchronicles-dev/Role-Credits- ; choose Repository -> Show in Explorer.
-Copy ONLY the `android/` folder and `.github/workflows/android-apk.yml` from this ZIP into the repository root, merging/replacing files. The existing desktop workflow must remain untouched. Commit and push to `main`.
+## Important reliability guarantees
 
-Do NOT upload your private signing kit, .p12 file, keystore passwords, or private key into the public repository, even to a private branch.
+- A release is published only after both jobs pass, and starts as a draft until all five assets are present. Drafts are invisible to the automatic updaters.
+- The existing four `RC_ANDROID_*` GitHub Actions secrets are reused; never store the private signing kit in the repository.
+- The previous Windows workflow no longer publishes older Windows-only versions every time source changes. The Android workflow no longer makes Android-only versions. Both remain quick CI checks.
+- Both platforms use the same `Role_Credits_Studio_Standalone.html` game content; `release/check_release.py` enforces byte equality with the Android embedded `index.html`.
+- There is **one** authoritative `release/VERSION` string. Android calculates its versionName and monotonic versionCode from it, and Windows receives that version through Go linker flags.
+- Re-running an already-published version deliberately fails. Change the version first. Do not overwrite existing release assets after publishing; that would invalidate download integrity expectations.
 
-## Configure signing secrets
+## Every subsequent release
 
-Use the companion, SEPARATE `Role_Credits_Android_Permanent_Signing_Kit_PRIVATE.zip`. Open its `SIGNING_SECRETS_KEEP_PRIVATE.txt` locally. In GitHub:
-Settings -> Secrets and variables -> Actions -> New repository secret
-and create each of the four keys exactly as listed. The `RC_ANDROID_KEYSTORE_BASE64` value is a LONG single-line base64 string. Do not include surrounding quotes.
-Keep an encrypted offline backup of `rolecredits-permanent-signing.p12` and its password. Anyone with both can impersonate your Android APK; loss of the key prevents seamless updates.
+1. Make game changes in `android/app/src/main/assets/index.html`, then **copy the exact same HTML bytes** to `Role_Credits_Studio_Standalone.html`. Or make changes in root HTML, then copy it the other way. They must match before releasing.
+2. Edit `release/VERSION`, e.g. `0.2.5.1`, and keep each component after major below 100.
+3. Edit `release/RELEASE_NOTES.md` for the new version.
+4. Commit + push. Trigger **Role Credits Unified Release** with the new version.
 
-## Build and publish
+## Troubleshooting
 
-Go to Actions -> Role Credits Android APK -> Run workflow -> tick **publish_signed_release** -> Run workflow. Once the run succeeds, open your GitHub Releases page:
-https://github.com/deathboundchronicles-dev/Role-Credits-/releases
-Download `Role_Credits_Android.apk` (NOT `app-debug.apk`), transfer/install it on your phone, and restore your exported campaign JSON. There may be an 'Install unknown apps' permission for the browser/file manager.
+- If `Check release sources` fails, the source HTMLs differ or version is mismatched. Do not deploy until resolved.
+- If `android` fails at signing, verify the same four secrets used to sign v0.2.4.6 still exist and haven't changed.
+- If a draft release gets created but publication fails, it will remain invisible to updaters. Inspect and fix before considering the release valid; don't overwrite signed public assets.
+- A GitHub Actions artifact with `Debug` in the name is not the published signed Android installer.
+- Protect and back up your permanent signing `.p12` file and its passwords offline: if they are lost, future Android updates cannot preserve the app identity.
 
-## Later Android updates
+## Windows note
 
-Change `versionName` and `versionCode` in `android/app/build.gradle`; update About text in MainActivity.java; bump to the NEXT version. Keep the package name and signing secrets unchanged. Publish the updated signed APK and `.sha256` assets under the matching `v<versionName>` GitHub release. The app's menu -> Check for Android updates will download and validate the update and open the Android installer. Data persists in same-signer installs.
-
-## Caveats
-
-GitHub Actions was successfully building v0.2.4.5 debug APKs before this patch. This updated Java code and the permanent-signing/release workflow have NOT yet compiled or run on GitHub; compilation and phone behavior need live verification. This environment has no Android SDK. Do not uninstall until the signed build succeeds and you have your verified backup.
+The Windows PE icon is **embedded** by the existing `embed_windows_icon.py` script, matching the approved branded icon. No Windows Authenticode signing certificate is included in this workflow; Windows SmartScreen may warn until one is arranged.

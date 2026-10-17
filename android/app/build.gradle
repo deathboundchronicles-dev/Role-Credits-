@@ -1,5 +1,17 @@
 plugins { id 'com.android.application' }
 
+// Both platform releases read the same committed version file.
+// v0.2.5.0 maps to versionCode 20500 (v0.2.4.6 was 20406).
+def unifiedVersion = file('../../release/VERSION').text.trim()
+if (!(unifiedVersion ==~ /\d+\.\d+\.\d+\.\d+/)) {
+    throw new GradleException('release/VERSION must contain four numeric parts')
+}
+def versionPieces = unifiedVersion.tokenize('.').collect { Integer.parseInt(it) }
+if (versionPieces[0] >= 2 || versionPieces.tail().any { it < 0 || it > 99 }) {
+    throw new GradleException('release/VERSION exceeds allowed Android versionCode range')
+}
+def generatedVersionCode = versionPieces[0] * 1000000 + versionPieces[1] * 10000 + versionPieces[2] * 100 + versionPieces[3]
+
 android {
     namespace 'media.rolecredits.studio'
     compileSdk 35
@@ -8,8 +20,8 @@ android {
         applicationId 'media.rolecredits.studio'
         minSdk 26
         targetSdk 35
-        versionCode 20406
-        versionName '0.2.4.6'
+        versionCode generatedVersionCode
+        versionName unifiedVersion
     }
     signingConfigs {
         release {

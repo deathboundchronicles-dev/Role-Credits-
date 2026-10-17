@@ -46,6 +46,13 @@ public final class MainActivity extends Activity {
     private MobileUpdater updater;
 
     private int dp(int value){return Math.round(value*getResources().getDisplayMetrics().density);}
+    /** Always report the actual installed APK version to the user. */
+    private String installedVersionLabel(){
+        try {
+            String version=getPackageManager().getPackageInfo(getPackageName(),0).versionName;
+            return version == null ? "unknown" : version;
+        } catch(Exception ignored) { return "unknown"; }
+    }
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
@@ -129,14 +136,14 @@ public final class MainActivity extends Activity {
         pm.getMenu().add(0,2,1,"Import campaign backup");
         pm.getMenu().add(0,3,2,"Check for Android updates");
         pm.getMenu().add(0,4,3,"Reload app");
-        pm.getMenu().add(0,5,4,"About · v0.2.4.6");
+        pm.getMenu().add(0,5,4,"About · v"+installedVersionLabel());
         pm.setOnMenuItemClickListener(item->{switch(item.getItemId()){
             case 1:web.evaluateJavascript("downloadData()",null);return true;
             case 2:openImport();return true;
             case 3:updater.checkNow();return true;
             case 4:web.reload();return true;
             case 5:new android.app.AlertDialog.Builder(this).setTitle("Role Credits Studio")
-                .setMessage("Android v0.2.4.6 · Offline character sheets, physical dice, and signed-update checking.\n\nUse Export campaign backup before uninstalling or switching devices. APK updates retain your data when installed with the same signing key.")
+                .setMessage("Android v"+installedVersionLabel()+" · Offline character sheets, physical dice, and signed-update checking.\n\nUse Export campaign backup before uninstalling or switching devices. APK updates retain your data when installed with the same signing key.")
                 .setPositiveButton("Got it",null).show();return true;
         }return false;});
         pm.show();
