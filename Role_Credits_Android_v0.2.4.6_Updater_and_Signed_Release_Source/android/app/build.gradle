@@ -1,0 +1,36 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'media.rolecredits.studio'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'media.rolecredits.studio'
+        minSdk 26
+        targetSdk 35
+        versionCode 20406
+        versionName '0.2.4.6'
+    }
+    signingConfigs {
+        release {
+            def keyPath = System.getenv('RC_ANDROID_KEYSTORE_FILE')
+            if (keyPath && file(keyPath).exists()) {
+                storeFile file(keyPath)
+                storePassword System.getenv('RC_ANDROID_STORE_PASSWORD')
+                keyAlias System.getenv('RC_ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('RC_ANDROID_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (System.getenv('RC_ANDROID_KEYSTORE_FILE') && file(System.getenv('RC_ANDROID_KEYSTORE_FILE')).exists())
+                signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
