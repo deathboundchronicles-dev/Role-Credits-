@@ -1,30 +1,36 @@
-
 name: Role Credits Android APK
 
 on:
   workflow_dispatch:
+    inputs:
+      publish_signed_release:
+        description: 'Publish a permanently signed Android release to GitHub Releases?'
+        required: true
+        type: boolean
+        default: false
   push:
+    branches:
+      - main
     paths:
       - 'android/**'
       - '.github/workflows/android-apk.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  build:
+  android:
     runs-on: ubuntu-latest
-
     steps:
       - name: Get project
         uses: actions/checkout@v4
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-          
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
         with:
@@ -35,13 +41,97 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Build Android APK
+      - name: Test the ordinary Android build
         working-directory: android
         run: gradle --no-daemon :app:assembleDebug
 
-      - name: Upload Android installer
+      - name: Upload debug test APK
         uses: actions/upload-artifact@v4
         with:
-          name: Role_Credits_Android_APK
+          name: Role_Credits_Android_Debug_Test_Only
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Restore private permanent Android signing key
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_signed_release }}
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.RC_ANDROID_KEYSTORE_BASE64 }}
+          RC_ANDROID_STORE_PASSWORD: ${{ secrets.RC_ANDROID_STORE_PASSWORD }}
+          RC_ANDROID_KEY_ALIAS: ${{ secrets.RC_ANDROID_KEY_ALIAS }}
+          RC_ANDROID_KEY_PASSWORD: ${{ secrets.RC_ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$KEYSTORE_B64" || -z "$RC_ANDROID_STORE_PASSWORD" || -z "$RC_ANDROID_KEY_ALIAS" || -z "$RC_ANDROID_KEY_PASSWORD" ]]; then
+            echo '::error::Missing Android permanent signing secret. Configure the four RC_ANDROID_* GitHub Actions secrets first.'
+            exit 1
+          fi
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/rolecredits-private-signing.p12"
+          chmod 600 "$RUNNER_TEMP/rolecredits-private-signing.p12"
+          test -s "$RUNNER_TEMP/rolecredits-private-signing.p12"
+
+      - name: Build permanently signed Android release
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_signed_release }}
+        working-directory: android
+        shell: bash
+        env:
+          RC_ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/rolecredits-private-signing.p12
+          RC_ANDROID_STORE_PASSWORD: ${{ secrets.RC_ANDROID_STORE_PASSWORD }}
+          RC_ANDROID_KEY_ALIAS: ${{ secrets.RC_ANDROID_KEY_ALIAS }}
+          RC_ANDROID_KEY_PASSWORD: ${{ secrets.RC_ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          gradle --no-daemon :app:assembleRelease
+          test -s app/build/outputs/apk/release/app-release.apk
+
+      - name: Verify release package and prepare checksum
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_signed_release }}
+        shell: bash
+        env:
+          RC_ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/rolecredits-private-signing.p12
+          RC_ANDROID_STORE_PASSWORD: ${{ secrets.RC_ANDROID_STORE_PASSWORD }}
+          RC_ANDROID_KEY_ALIAS: ${{ secrets.RC_ANDROID_KEY_ALIAS }}
+          RC_ANDROID_KEY_PASSWORD: ${{ secrets.RC_ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f -name apksigner | sort -V | tail -1)"
+          test -x "$APKSIGNER"
+          "$APKSIGNER" verify --verbose "$APK"
+          keytool -list -keystore "$RC_ANDROID_KEYSTORE_FILE" -storepass "$RC_ANDROID_STORE_PASSWORD" -alias "$RC_ANDROID_KEY_ALIAS" >/dev/null
+          cp "$APK" Role_Credits_Android.apk
+          sha256sum Role_Credits_Android.apk > Role_Credits_Android.sha256
+          test -s Role_Credits_Android.sha256
+
+      - name: Upload permanently signed installer
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_signed_release }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Role_Credits_Android_Signed_Installer
+          path: |
+            Role_Credits_Android.apk
+            Role_Credits_Android.sha256
+          if-no-files-found: error
+
+      - name: Publish signed APK and checksum to GitHub Releases
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_signed_release }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION="$(sed -n "s/^[[:space:]]*versionName '\([^']*\)'.*$/\1/p" android/app/build.gradle | head -1)"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo '::error::Invalid Android versionName'; exit 1; }
+          TAG="v$VERSION"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -Fxq 'Role_Credits_Android.apk'; then
+              echo "::error::Android release $TAG has already been published. Bump versionName and versionCode before replacing APKs."
+              exit 1
+            fi
+            gh release upload "$TAG" Role_Credits_Android.apk Role_Credits_Android.sha256 --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" Role_Credits_Android.apk Role_Credits_Android.sha256 \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+              --title "Role Credits Android $TAG" --notes 'Signed Android installer with in-app update checking, SHA-256 verification, and Android certificate matching.'
+          fi
+          echo "Published verified Android release: $TAG"
