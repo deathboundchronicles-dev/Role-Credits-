@@ -43,6 +43,7 @@ public final class MainActivity extends Activity {
     private WebView web;
     private android.webkit.ValueCallback<Uri[]> chooser;
     private byte[] pendingExport;
+    private MobileUpdater updater;
 
     private int dp(int value){return Math.round(value*getResources().getDisplayMetrics().density);}
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
@@ -116,6 +117,8 @@ public final class MainActivity extends Activity {
             }
         });
         if(state!=null)web.restoreState(state);else web.loadUrl(ORIGIN+"index.html");
+        updater=new MobileUpdater(this);
+        updater.checkInBackgroundIfDue();
     }
     private void openExternal(Uri uri){
         try{startActivity(new Intent(Intent.ACTION_VIEW,uri));}catch(Exception e){Toast.makeText(this,"No app to open link",Toast.LENGTH_SHORT).show();}
@@ -124,16 +127,16 @@ public final class MainActivity extends Activity {
         PopupMenu pm=new PopupMenu(this,anchor);
         pm.getMenu().add(0,1,0,"Export campaign backup");
         pm.getMenu().add(0,2,1,"Import campaign backup");
-        pm.getMenu().add(0,3,2,"Check mobile updates");
+        pm.getMenu().add(0,3,2,"Check for Android updates");
         pm.getMenu().add(0,4,3,"Reload app");
-        pm.getMenu().add(0,5,4,"About · v0.2.4.5");
+        pm.getMenu().add(0,5,4,"About · v0.2.4.6");
         pm.setOnMenuItemClickListener(item->{switch(item.getItemId()){
             case 1:web.evaluateJavascript("downloadData()",null);return true;
             case 2:openImport();return true;
-            case 3:openExternal(Uri.parse("https://github.com/deathboundchronicles-dev/Role-Credits-/releases"));return true;
+            case 3:updater.checkNow();return true;
             case 4:web.reload();return true;
             case 5:new android.app.AlertDialog.Builder(this).setTitle("Role Credits Studio")
-                .setMessage("Android v0.2.4.5 · Offline character sheets and physical dice.\n\nUse Export campaign backup before uninstalling or switching devices. APK updates retain your data when installed with the same signing key.")
+                .setMessage("Android v0.2.4.6 · Offline character sheets, physical dice, and signed-update checking.\n\nUse Export campaign backup before uninstalling or switching devices. APK updates retain your data when installed with the same signing key.")
                 .setPositiveButton("Got it",null).show();return true;
         }return false;});
         pm.show();
@@ -159,6 +162,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(updater!=null && updater.onActivityResult(requestCode))return;
         if(requestCode==REQUEST_PICK_FILE){
             if(chooser!=null){Uri[] result=(resultCode==RESULT_OK&&data!=null&&data.getData()!=null)?new Uri[]{data.getData()}:null;chooser.onReceiveValue(result);chooser=null;}
         } else if(requestCode==REQUEST_SAVE_FILE){
