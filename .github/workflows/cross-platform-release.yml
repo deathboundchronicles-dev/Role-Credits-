@@ -1,0 +1,214 @@
+name: Role Credits Unified Release (Windows + Android)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (must match release/VERSION, e.g. 0.2.5.0)'
+        required: true
+        type: string
+        default: '0.2.5.0'
+      channel:
+        description: 'Release channel'
+        required: true
+        type: choice
+        options:
+          - prerelease
+          - stable
+        default: prerelease
+
+permissions:
+  contents: read
+
+concurrency:
+  group: role-credits-official-release
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lock release to one committed version and one game HTML
+        id: version
+        shell: bash
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          python3 release/check_release.py "$REQUESTED_VERSION"
+          echo "version=$(cat release/VERSION | tr -d '\r\n')" >> "$GITHUB_OUTPUT"
+
+  windows:
+    needs: verify
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Test Windows updater
+        shell: pwsh
+        run: |
+          go test ./...
+          if ($LASTEXITCODE -ne 0) { throw 'Go tests failed' }
+      - name: Build versioned branded Windows x64 installer
+        shell: pwsh
+        env:
+          RC_VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $env:CGO_ENABLED = '0'
+          go build -trimpath -ldflags "-s -w -H windowsgui -X main.appVersion=$env:RC_VERSION" -o Role_Credits_Setup.exe .
+          if ($LASTEXITCODE -ne 0) { throw 'Windows build failed' }
+          python embed_windows_icon.py Role_Credits_Setup.exe Role_Credits.ico
+          if ($LASTEXITCODE -ne 0) { throw 'Windows icon embedding failed' }
+          $digest = (Get-FileHash 'Role_Credits_Setup.exe' -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$digest  Role_Credits_Setup.exe" | Set-Content 'Role_Credits_Setup.sha256' -Encoding ascii
+          Copy-Item Role_Credits_Setup.exe Role_Credits.exe
+          if (!(Test-Path Role_Credits.ico)) { throw 'Missing approved icon' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: role-credits-official-windows
+          path: |
+            Role_Credits_Setup.exe
+            Role_Credits_Setup.sha256
+            Role_Credits.exe
+          if-no-files-found: error
+          retention-days: 7
+
+  android:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Verify Android debug build
+        working-directory: android
+        run: gradle --no-daemon :app:assembleDebug
+      - name: Restore and validate permanent Role Credits signing key
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.RC_ANDROID_KEYSTORE_BASE64 }}
+          RC_ANDROID_STORE_PASSWORD: ${{ secrets.RC_ANDROID_STORE_PASSWORD }}
+          RC_ANDROID_KEY_ALIAS: ${{ secrets.RC_ANDROID_KEY_ALIAS }}
+          RC_ANDROID_KEY_PASSWORD: ${{ secrets.RC_ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$KEYSTORE_B64" || -z "$RC_ANDROID_STORE_PASSWORD" || -z "$RC_ANDROID_KEY_ALIAS" || -z "$RC_ANDROID_KEY_PASSWORD" ]]; then
+            echo '::error::Missing required permanent Android signing secret'
+            exit 1
+          fi
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/rolecredits-private-signing.p12"
+          chmod 600 "$RUNNER_TEMP/rolecredits-private-signing.p12"
+          keytool -list -storetype PKCS12 -keystore "$RUNNER_TEMP/rolecredits-private-signing.p12" \
+            -storepass "$RC_ANDROID_STORE_PASSWORD" -alias "$RC_ANDROID_KEY_ALIAS" >/dev/null
+      - name: Build permanently signed Android APK
+        shell: bash
+        working-directory: android
+        env:
+          RC_ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/rolecredits-private-signing.p12
+          RC_ANDROID_STORE_PASSWORD: ${{ secrets.RC_ANDROID_STORE_PASSWORD }}
+          RC_ANDROID_KEY_ALIAS: ${{ secrets.RC_ANDROID_KEY_ALIAS }}
+          RC_ANDROID_KEY_PASSWORD: ${{ secrets.RC_ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          gradle --no-daemon :app:assembleRelease
+          test -s app/build/outputs/apk/release/app-release.apk
+      - name: Verify signed APK, version and checksum
+        shell: bash
+        env:
+          RC_VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f -name apksigner | sort -V | tail -1)"
+          AAPT="$(find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f -name aapt | sort -V | tail -1)"
+          test -x "$APKSIGNER"
+          test -x "$AAPT"
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+          BADGING="$($AAPT dump badging "$APK" | head -n 1)"
+          echo "$BADGING" | grep -F "name='media.rolecredits.studio'"
+          echo "$BADGING" | grep -F "versionName='$RC_VERSION'"
+          cp "$APK" Role_Credits_Android.apk
+          sha256sum Role_Credits_Android.apk > Role_Credits_Android.sha256
+          sha256sum --check Role_Credits_Android.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: role-credits-official-android
+          path: |
+            Role_Credits_Android.apk
+            Role_Credits_Android.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: [verify, windows, android]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: role-credits-official-windows
+          path: dist/windows
+      - uses: actions/download-artifact@v4
+        with:
+          name: role-credits-official-android
+          path: dist/android
+      - name: Check both installers and both checksums before publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd dist/windows && sha256sum --check Role_Credits_Setup.sha256)
+          (cd dist/android && sha256sum --check Role_Credits_Android.sha256)
+          for f in dist/windows/Role_Credits_Setup.exe dist/windows/Role_Credits_Setup.sha256 \
+                   dist/windows/Role_Credits.exe dist/android/Role_Credits_Android.apk \
+                   dist/android/Role_Credits_Android.sha256; do
+            test -s "$f" || { echo "::error::Missing installer asset $f"; exit 1; }
+          done
+      - name: Publish one complete atomic GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RC_VERSION: ${{ needs.verify.outputs.version }}
+          RC_CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          TAG="v$RC_VERSION"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Release $TAG already exists. Never replace published installer bits; bump release/VERSION."
+            exit 1
+          fi
+          release_type=()
+          if [[ "$RC_CHANNEL" == 'prerelease' ]]; then release_type=(--prerelease); fi
+          # Draft releases are invisible to both updaters until ALL five assets are verified.
+          gh release create "$TAG" \
+            dist/windows/Role_Credits_Setup.exe \
+            dist/windows/Role_Credits_Setup.sha256 \
+            dist/windows/Role_Credits.exe \
+            dist/android/Role_Credits_Android.apk \
+            dist/android/Role_Credits_Android.sha256 \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Role Credits Studio $TAG | Windows + Android" \
+            --notes-file release/RELEASE_NOTES.md --draft "${release_type[@]}"
+          for asset in Role_Credits_Setup.exe Role_Credits_Setup.sha256 Role_Credits.exe Role_Credits_Android.apk Role_Credits_Android.sha256; do
+            gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -Fxq "$asset" || {
+              echo "::error::Missing uploaded release asset: $asset. Draft will stay unpublished."
+              exit 1
+            }
+          done
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false
+          echo "Published official Windows + Android release: $TAG"
