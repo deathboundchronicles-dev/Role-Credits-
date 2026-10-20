@@ -1,19 +1,10 @@
-## Role Credits Studio v0.2.5.0
+## Role Credits Studio v0.2.6.0
 
-**One release, two platforms.** This cross-platform release unifies the desktop and Android distribution channels with one shared version and identical underlying Role Credits game HTML.
+- Keeps text controls connected during builder validation, preserving typing, caret, composition, focus, and scroll. Draft text saves while typing; dropdown choices update existing controls.
+- Adds the offline Homebrew Library: search, type/category filters, selections, collections, previews, item/selection/collection/library export, and versioned shareable JSON.
+- Validates and migrates imports, requires explicit conflict choices, remaps copied links, and preserves live player/campaign state. Backups support merge or reviewed exact restore, local recovery, and failed-write rollback.
+- Packages identical canonical HTML for Windows, Android, and standalone distribution. Shared regressions run before coordinated publication.
 
-### Windows
-- Signed-checksum Windows x64 installer with the existing in-app GitHub update mechanism.
-- Approved Role Credits branded icon embedded in the Windows executable.
-- Offline character sheets, campaigns, rosters, dice and Token mechanics.
+Download `Role_Credits_Setup.exe` for Windows, `Role_Credits_Android.apk` for Android, or `Role_Credits_Studio_Standalone.html` for a browser. Checksums accompany downloads. Windows has no Authenticode publisher signature. Android publication requires the existing permanent signing key; verify same-certificate upgrades on a real device. Export a campaign backup before upgrading or changing browsers/devices.
 
-### Android
-- Permanently signed Android APK, compatible with the existing v0.2.4.6 production signing key.
-- Native campaign backups, file picker, physical dice, and manual/automatic signed update checks.
-- Android's own install-confirmation screen, verified APK checksum and matching app signing certificate.
-
-### Distribution
-- Both installers are built from a single commit and published together to one GitHub Releases entry, alongside independent SHA-256 checksums.
-- Back up campaign JSON before upgrading, particularly when changing devices. Same-signature Android updates should preserve local data.
-
-**Note:** The Android release is signed by the permanent Role Credits certificate. The Windows checksum verifies download integrity but is not an Authenticode publisher certificate; Windows may show an unrecognized-publisher warning.
+Publish changed bytes only under a new version. v0.2.5.0 assets remain untouched.

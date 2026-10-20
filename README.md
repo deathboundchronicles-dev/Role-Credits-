@@ -1,32 +1,51 @@
-# Role Credits Studio Desktop (Windows)
+# Role Credits Studio
 
-This Windows launcher serves the embedded, audited Role Credits HTML entirely from `127.0.0.1:38471`. It retains the same localStorage origin across **this launcher family**, even after replacing the application executable.
+Offline character, campaign, and homebrew tools for Windows, Android, and a standalone HTML file. The next version is **0.2.6.0**. Never replace existing v0.2.5.0 release assets.
 
-## Install
+## One shared app
 
-Run `Role_Credits_Setup.exe` on Windows. It copies itself as `%LOCALAPPDATA%\Programs\Role Credits Studio\Role_Credits.exe`, adds a Start Menu shortcut, and launches the application. Keep a JSON export before switching from an older launcher: the **older** launcher's localhost port/origin has not been recovered, and browser storage does not automatically migrate between origins.
+`index.html` is the canonical game UI. Modules in `app/` are bundled by `node scripts/sync-app.mjs`, which also generates byte-identical copies at `Role_Credits_Studio_Standalone.html` and `android/app/src/main/assets/index.html`. All three files are self-contained and work offline. Commit the generated copies. `node scripts/sync-app.mjs --check` and `python release/check_release.py` reject mismatches.
 
-## Updates
+The Windows launcher embeds the standalone copy and retains `http://127.0.0.1:38471` as its storage origin. Android retains its application ID, appassets origin, and permanent signing-key configuration. Moving the standalone file or changing browsers may use different storage; use campaign backups to transfer live data.
 
-The launcher checks `https://api.github.com/repos/deathboundchronicles-dev/Role-Credits-/releases?per_page=30` no more than once per 12 hours per running process, plus manual `Check for Updates`. It includes prereleases. It selects only releases newer than its embedded numeric version that contain **both** `Role_Credits_Setup.exe` and `Role_Credits_Setup.sha256`. It retrieves and checks SHA-256 before running the downloaded setup. A consent click is required; network and checksum failures do not touch the installed launcher.
+## Homebrew Library
 
-`Role_Credits_Setup.exe` also supports `--install`. During a self-update, the old server process exits after handing off the verified installer; the setup retries replacing a still-running launcher, preserves its previous binary until replacement is staged, then relaunches. These mechanics are covered by unit tests for parsing/checker/HTML injection, but real Windows installation, process handoff and browser-origin behavior require testing on Windows.
+Open **Build & Workshop → Creation → Homebrew Library**. Search names, Tags, and rules text; filter by type, category, or collection; select items and save named collections. Supported types include Cliques, Backgrounds, Techniques, Equipment, Team Assets, Threats, Adventures, Missions, Scenes, Crises, Situations, Obstacles, Catastrophes, and custom Tags. The snapshot menu captures the active character, character build draft, team, or earned Signature Moves as separate library copies.
 
-**Important:** This source package alone does not publish a release. At the time of audit, GitHub Releases for the canonical repository was empty. Existing installed `0.2.1.2` updaters cannot find a new version until a GitHub Release is actually published with the required asset names and a higher version, e.g. `v0.2.1.3`.
+Export one item, a selection, a collection, or the entire library. Linked designs are included by default; disable the checkbox for an exact selection. **Share Pack** uses file sharing where supported and otherwise downloads JSON. Android uses its native save-location picker. No online service is required.
 
-## Build and tests
+Imports preview incoming data before writing. Matching IDs or normalized names require **skip**, **keep both**, or an explicitly selected **replace** target. Keep-both changes the ID/name and remaps links within the pack. Collection conflicts produce named copies shown in preview. Duplicate IDs inside a file are rejected as ambiguous; fix source IDs or export separate packs. Missing links produce warnings. Import validation is structural; builders retain responsibility for mechanical rules.
 
-Run `go test ./...` from this folder. Build on any machine with Go 1.23+:
+Library imports update only the current campaign's reusable library, preserving live characters, teams, scenes, drafts, and other campaign profiles. Snapshots are not automatically installed into sheets. The main campaign importer recognizes Homebrew packs and routes them to library preview.
+
+Download library backups for safekeeping. A recovery backup is also saved before library management writes, separately for each campaign or Free Agent workspace. **Recover Last Local Backup** offers a reviewed merge or **Preview Exact Library Restore**, which lists the replacement and removed items before confirmation. Exact restore changes only that library. Failed writes roll back the library and persisted campaign records. Regular **Export JSON** campaign backups include live players and all profiles.
+
+## Portable JSON
+
+Packs use `format: "RoleCreditsHomebrew"`, `schemaVersion: 2`, a `name`, typed `items: [{type, data}]`, and optional `collections: [{id, name, members: [{type, id}]}]`. Backups carry `kind: "backup"`. Item extension fields are retained. Unknown types/future schemas are rejected. Schema 1 and legacy libraries, including the library portion of Studio V2 exports, migrate through preview.
+
+Limits: 18 MB, 5,000 items, 500 collections, and 30 JSON nesting levels. Invalid shapes, numeric fields, unsafe IDs/properties, ambiguous IDs, and malformed objectives are rejected before storage changes. Captured snapshots may contain portraits and personal fiction; preview before sharing.
+
+## Development and checks
+
+Use Node 22+, pnpm 11.25.0, Python 3, and Go 1.23+:
 
 ```
-GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags='-s -w -H windowsgui' -o Role_Credits_Setup.exe .
+pnpm install --frozen-lockfile
+node scripts/sync-app.mjs
+pnpm test
+pnpm exec playwright install chromium
+pnpm test:browser
+go test ./...
+python release/check_release.py
 ```
 
-The application is embedded at compile time. When releasing changes, replace `Role_Credits_Studio_Standalone.html`, bump `appVersion`, and rebuild both installer and checksums. Never publish changed bytes under an existing version number.
+Browser tests run offline in desktop, Android phone, and tablet touch viewports. They check typing/node identity/caret/composition, saving and reload, dropdown scrolling, ten builder suites, file round trips, collections, conflict preview, exact restore, failed-storage rollback, campaign preservation, and imported-item editing. Evidence goes to `test-results/`. Set `RC_BROWSER` to use an installed Chromium executable. `node tests/reproduce-input.cjs` reproduces the original bug from the untouched v0.2.5.0 tag.
 
-## Known boundaries
+Build Windows with `scripts/build-windows.ps1`, optionally supplying `-GoExecutable` and `-PythonExecutable`. Outputs/checksums go to `dist/v<version>/`, leaving older root binaries intact. Windows installers have no Authenticode signature.
 
-- The preexisting Windows installed launcher and its private local files were not accessible during this audit. Compatibility with its exact install path/origin was not verified.
-- Windows code signing (Authenticode) was not available. SHA-256 downloaded from the same GitHub Release protects against accidental corruption, not compromise of the GitHub account.
-- Windows binary was cross-compiled and structurally checked on Linux; no Windows execution or SmartScreen behavior was verified.
-- No release has been published automatically by producing this source/ZIP.
+## Releases
+
+`release/VERSION` controls Android versionName/versionCode and coordinated builds. Keep the default Windows version in `main.go` aligned. The **Unified Release** workflow runs shared regressions, builds both platforms from one commit, verifies Android signing, and publishes Windows, Android, standalone HTML, and checksums together. Existing tags are refused. Separate Windows/Android workflows produce artifacts only, avoiding competing partial releases.
+
+Signed Android builds require `RC_ANDROID_KEYSTORE_BASE64`, `RC_ANDROID_STORE_PASSWORD`, `RC_ANDROID_KEY_ALIAS`, and `RC_ANDROID_KEY_PASSWORD` repository secrets. Missing signing material is an explicit failure, never a debug-key fallback. Touch viewport tests do not prove physical Android keyboard/WebView behavior; check devices and same-certificate upgrade retention before calling a release device-verified.

@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (must match release/VERSION, e.g. 0.2.5.0)'
+        description: 'Release version (must match release/VERSION, e.g. 0.2.6.0)'
         required: true
         type: string
-        default: '0.2.5.0'
+        default: '0.2.6.0'
       channel:
         description: 'Release channel'
         required: true
@@ -31,6 +31,17 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11.25.0'
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/sync-app.mjs --check
+      - run: pnpm test
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:browser
       - name: Lock release to one committed version and one game HTML
         id: version
         shell: bash
@@ -40,6 +51,11 @@ jobs:
           set -euo pipefail
           python3 release/check_release.py "$REQUESTED_VERSION"
           echo "version=$(cat release/VERSION | tr -d '\r\n')" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-browser-evidence
+          path: test-results/
 
   windows:
     needs: verify
@@ -130,6 +146,7 @@ jobs:
         shell: bash
         env:
           RC_VERSION: ${{ needs.verify.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           APK=android/app/build/outputs/apk/release/app-release.apk
@@ -138,6 +155,15 @@ jobs:
           test -x "$APKSIGNER"
           test -x "$AAPT"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
+          mkdir -p "$RUNNER_TEMP/previous-android"
+          gh release download v0.2.5.0 --repo "$GITHUB_REPOSITORY" \
+            --pattern Role_Credits_Android.apk --pattern Role_Credits_Android.sha256 \
+            --dir "$RUNNER_TEMP/previous-android"
+          (cd "$RUNNER_TEMP/previous-android" && sha256sum --check Role_Credits_Android.sha256)
+          CURRENT_CERT="$("$APKSIGNER" verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')"
+          PREVIOUS_CERT="$("$APKSIGNER" verify --print-certs "$RUNNER_TEMP/previous-android/Role_Credits_Android.apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')"
+          test -n "$CURRENT_CERT"
+          test "$CURRENT_CERT" = "$PREVIOUS_CERT" || { echo '::error::Android signer differs from v0.2.5.0. Do not publish an incompatible update.'; exit 1; }
           BADGING="$($AAPT dump badging "$APK" | head -n 1)"
           echo "$BADGING" | grep -F "name='media.rolecredits.studio'"
           echo "$BADGING" | grep -F "versionName='$RC_VERSION'"
@@ -194,6 +220,7 @@ jobs:
           fi
           release_type=()
           if [[ "$RC_CHANNEL" == 'prerelease' ]]; then release_type=(--prerelease); fi
+          sha256sum Role_Credits_Studio_Standalone.html > Role_Credits_Studio_Standalone.sha256
           # Draft releases are invisible to both updaters until ALL five assets are verified.
           gh release create "$TAG" \
             dist/windows/Role_Credits_Setup.exe \
@@ -201,10 +228,11 @@ jobs:
             dist/windows/Role_Credits.exe \
             dist/android/Role_Credits_Android.apk \
             dist/android/Role_Credits_Android.sha256 \
+            Role_Credits_Studio_Standalone.html Role_Credits_Studio_Standalone.sha256 \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "Role Credits Studio $TAG | Windows + Android" \
             --notes-file release/RELEASE_NOTES.md --draft "${release_type[@]}"
-          for asset in Role_Credits_Setup.exe Role_Credits_Setup.sha256 Role_Credits.exe Role_Credits_Android.apk Role_Credits_Android.sha256; do
+          for asset in Role_Credits_Setup.exe Role_Credits_Setup.sha256 Role_Credits.exe Role_Credits_Android.apk Role_Credits_Android.sha256 Role_Credits_Studio_Standalone.html Role_Credits_Studio_Standalone.sha256; do
             gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -Fxq "$asset" || {
               echo "::error::Missing uploaded release asset: $asset. Draft will stay unpublished."
               exit 1

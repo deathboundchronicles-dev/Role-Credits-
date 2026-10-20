@@ -1,0 +1,10 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+.tools/
+android/.gradle/
+android/local.properties
+android/app/build/
+*.p12
+*.jks

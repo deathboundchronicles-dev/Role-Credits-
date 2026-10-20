@@ -3,8 +3,8 @@ name: Role Credits Android APK
 on:
   workflow_dispatch:
     inputs:
-      publish_signed_release:
-        description: 'Publish a permanently signed Android release to GitHub Releases?'
+      build_signed_release:
+        description: 'Build a permanently signed artifact? Publish with the unified release workflow.'
         required: true
         type: boolean
         default: false
@@ -16,7 +16,7 @@ on:
       - '.github/workflows/android-apk.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   android:
@@ -53,7 +53,7 @@ jobs:
           if-no-files-found: error
 
       - name: Restore private permanent Android signing key
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_signed_release }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_signed_release }}
         shell: bash
         env:
           KEYSTORE_B64: ${{ secrets.RC_ANDROID_KEYSTORE_BASE64 }}
@@ -71,7 +71,7 @@ jobs:
           test -s "$RUNNER_TEMP/rolecredits-private-signing.p12"
 
       - name: Build permanently signed Android release
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_signed_release }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_signed_release }}
         working-directory: android
         shell: bash
         env:
@@ -85,7 +85,7 @@ jobs:
           test -s app/build/outputs/apk/release/app-release.apk
 
       - name: Verify release package and prepare checksum
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_signed_release }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_signed_release }}
         shell: bash
         env:
           RC_ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/rolecredits-private-signing.p12
@@ -104,7 +104,7 @@ jobs:
           test -s Role_Credits_Android.sha256
 
       - name: Upload permanently signed installer
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_signed_release }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_signed_release }}
         uses: actions/upload-artifact@v4
         with:
           name: Role_Credits_Android_Signed_Installer
@@ -112,26 +112,3 @@ jobs:
             Role_Credits_Android.apk
             Role_Credits_Android.sha256
           if-no-files-found: error
-
-      - name: Publish signed APK and checksum to GitHub Releases
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_signed_release }}
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          VERSION="$(sed -n "s/^[[:space:]]*versionName '\([^']*\)'.*$/\1/p" android/app/build.gradle | head -1)"
-          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo '::error::Invalid Android versionName'; exit 1; }
-          TAG="v$VERSION"
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -Fxq 'Role_Credits_Android.apk'; then
-              echo "::error::Android release $TAG has already been published. Bump versionName and versionCode before replacing APKs."
-              exit 1
-            fi
-            gh release upload "$TAG" Role_Credits_Android.apk Role_Credits_Android.sha256 --repo "$GITHUB_REPOSITORY"
-          else
-            gh release create "$TAG" Role_Credits_Android.apk Role_Credits_Android.sha256 \
-              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
-              --title "Role Credits Android $TAG" --notes 'Signed Android installer with in-app update checking, SHA-256 verification, and Android certificate matching.'
-          fi
-          echo "Published verified Android release: $TAG"
