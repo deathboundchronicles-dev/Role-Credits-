@@ -46,6 +46,6 @@ Build Windows with `scripts/build-windows.ps1`, optionally supplying `-GoExecuta
 
 ## Releases
 
-`release/VERSION` controls Android versionName/versionCode and coordinated builds. Keep the default Windows version in `main.go` aligned. The **Unified Release** workflow runs shared regressions, builds both platforms from one commit, verifies Android signing, and publishes Windows, Android, standalone HTML, and checksums together. Existing tags are refused. Separate Windows/Android workflows produce artifacts only, avoiding competing partial releases.
+`release/VERSION` controls Android versionName/versionCode and coordinated builds. Keep the default Windows version in `main.go` aligned. Pushing a changed version file to `main` starts the **Unified Release** workflow as a prerelease; it can also be run manually. It runs shared regressions, builds both platforms from one commit, verifies Android signing, and publishes Windows, Android, standalone HTML, and checksums together. Existing tags are refused. Separate Windows/Android workflows produce artifacts only, avoiding competing partial releases.
 
 Signed Android builds require `RC_ANDROID_KEYSTORE_BASE64`, `RC_ANDROID_STORE_PASSWORD`, `RC_ANDROID_KEY_ALIAS`, and `RC_ANDROID_KEY_PASSWORD` repository secrets. Missing signing material is an explicit failure, never a debug-key fallback. Touch viewport tests do not prove physical Android keyboard/WebView behavior; check devices and same-certificate upgrade retention before calling a release device-verified.

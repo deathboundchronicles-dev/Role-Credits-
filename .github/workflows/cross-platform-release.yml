@@ -1,6 +1,9 @@
 name: Role Credits Unified Release (Windows + Android)
 
 on:
+  push:
+    branches: [main]
+    paths: ['release/VERSION']
   workflow_dispatch:
     inputs:
       version:
@@ -49,7 +52,11 @@ jobs:
           REQUESTED_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
-          python3 release/check_release.py "$REQUESTED_VERSION"
+          if [[ -n "$REQUESTED_VERSION" ]]; then
+            python3 release/check_release.py "$REQUESTED_VERSION"
+          else
+            python3 release/check_release.py
+          fi
           echo "version=$(cat release/VERSION | tr -d '\r\n')" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
@@ -210,7 +217,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RC_VERSION: ${{ needs.verify.outputs.version }}
-          RC_CHANNEL: ${{ inputs.channel }}
+          RC_CHANNEL: ${{ inputs.channel || 'prerelease' }}
         run: |
           set -euo pipefail
           TAG="v$RC_VERSION"

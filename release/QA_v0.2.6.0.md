@@ -16,5 +16,5 @@ Verified locally on Windows with Microsoft Edge through Playwright. The Android 
 ## Remaining delivery checks
 
 - No permanent Android signing material is present locally, and no Android build was produced locally. The coordinated workflow requires the existing four signing secrets and compares the resulting certificate to the published v0.2.5.0 APK before publication.
-- The GitHub workflow changes are prepared locally. No commit, push, workflow dispatch, or publication has occurred as part of this verification. GitHub execution must confirm the actual signed APK and downloadable release URLs.
+- The verified update is committed locally. On the October 24 retry, the command-line push still had no GitHub credentials and the connected GitHub app rejected a repository write with `403 Resource not accessible by integration`. No push, workflow run, or publication succeeded. The unified workflow now also starts when an approved version-file change is pushed to main. GitHub execution must confirm the actual signed APK and downloadable release URLs.
 - Real Android IME/keyboard behavior, system file-picker behavior, and same-certificate upgrade/data retention still need device testing. Browser tests verify only the shared HTML and the mocked native export handoff.
