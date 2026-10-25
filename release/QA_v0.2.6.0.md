@@ -13,8 +13,14 @@ Verified locally on Windows with Microsoft Edge through Playwright. The Android 
 - Windows x64 installer and portable executable built with Go 1.27.3. Approved icon resources were embedded and structurally checked. Installer SHA-256: `64a30ae941740fa729654ede107d0725a8f2451108d6e9dd26bb6329e82e7a2a`. These are unsigned Windows binaries; a real installation/self-update handoff was not exercised.
 - Outputs: `dist/v0.2.6.0/Role_Credits_Setup.exe`, `Role_Credits.exe`, `Role_Credits_Studio_Standalone.html`, and checksum files. Older root binaries and v0.2.5.0 GitHub release assets are untouched.
 
-## Remaining delivery checks
+## Published release verification
 
-- No permanent Android signing material is present locally, and no Android build was produced locally. The coordinated workflow requires the existing four signing secrets and compares the resulting certificate to the published v0.2.5.0 APK before publication.
-- The verified update is committed locally. On the October 24 retry, the command-line push still had no GitHub credentials and the connected GitHub app rejected a repository write with `403 Resource not accessible by integration`. No push, workflow run, or publication succeeded. The unified workflow now also starts when an approved version-file change is pushed to main. GitHub execution must confirm the actual signed APK and downloadable release URLs.
+- Published [v0.2.6.0](https://github.com/deathboundchronicles-dev/Role-Credits-/releases/tag/v0.2.6.0) as a prerelease from commit `47ed0412dbacfa28ae9bf9f4bf247b539c34c22a`. The [coordinated workflow](https://github.com/deathboundchronicles-dev/Role-Credits-/actions/runs/40157116708) passed verification, Windows, Android, and publication. The [independent regression workflow](https://github.com/deathboundchronicles-dev/Role-Credits-/actions/runs/40157115502) also passed.
+- Android versionName `0.2.6.0`, versionCode `20600`, and the existing application ID were verified. `apksigner` verified the signed APK, and its certificate matches v0.2.5.0: `64481bb3ba310445af8d25a7659f2b273e7624e2b544414a925feb6e5fdc96bd`. The permanent signing key remained in GitHub Actions.
+- Downloaded all seven published assets and independently checked their sizes, GitHub SHA-256 digests, and accompanying checksum files. Published Windows installer/portable: `3a97ad91c146b6870b9201ef4312b014a7b1426e91edeadd77bfda88282838f8` (10,359,808 bytes each). Published APK: `0e57f37329d76d33ab079792c03b683db09bfc085e1dd2a313fca07d1a4d7ce0` (2,520,127 bytes). Standalone HTML: `70f81c3dcedb68fe25faefc77d0f3c37c380db3752e672cb97b95c547feb3cbd` (3,472,168 bytes).
+- Independently inspected the downloaded APK ZIP and Windows x64 PE files. The APK's `assets/index.html`, both Windows embedded payloads, the downloadable standalone, and canonical source are byte-identical. Downloads and full verification records are in `dist/v0.2.6.0/published/` locally.
+- Rechecked v0.2.5.0's original source commit and Windows/Android asset digests; they are unchanged. CI browser tests now use supported Ubuntu 24.04, and Android verification uses the configured SDK 35 tools with normalized certificate output.
+
+## Remaining device checks
+
 - Real Android IME/keyboard behavior, system file-picker behavior, and same-certificate upgrade/data retention still need device testing. Browser tests verify only the shared HTML and the mocked native export handoff.
