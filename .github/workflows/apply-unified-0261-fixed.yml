@@ -1,0 +1,50 @@
+name: Apply Role Credits Unified 0.2.6.1 (fixed)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11.25.0'
+      - name: Download patch
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://drive.google.com/uc?export=download&id=1QYvMxtgEBAZ2OYQ3hjTtcuSIUITV3u20' -o /tmp/rc-update.zip
+          unzip -t /tmp/rc-update.zip
+          mkdir -p /tmp/rc-update
+          unzip -q /tmp/rc-update.zip -d /tmp/rc-update
+      - name: Apply patch and synchronize source module
+        run: |
+          set -euo pipefail
+          node /tmp/rc-update/apply_role_credits_unified.mjs "$GITHUB_WORKSPACE"
+          sed -i 's/appVersion: options.appVersion || "0.2.6.0"/appVersion: options.appVersion || "0.2.6.1"/' app/homebrew.js
+          node /tmp/rc-update/apply_role_credits_unified.mjs "$GITHUB_WORKSPACE" --verify-only
+          node scripts/sync-app.mjs --check
+          python3 release/check_release.py 0.2.6.1
+      - name: Test all
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm test
+          pnpm exec playwright install --with-deps chromium
+          pnpm test:browser
+      - name: Commit tested release
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html Role_Credits_Studio_Standalone.html android/app/src/main/assets/index.html main.go release/VERSION release/RELEASE_NOTES.md README.md package.json tests/browser.cjs tests/companion-browser.cjs app/homebrew.js
+          git commit -m "Release 0.2.6.1: hybrid parents and offline companion"
+          git push origin HEAD:main
+      - name: Trigger signed release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run cross-platform-release.yml --ref main -f version=0.2.6.1 -f channel=prerelease
