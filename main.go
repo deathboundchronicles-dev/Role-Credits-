@@ -38,7 +38,7 @@ const (
 	port = "38471"
 )
 
-var appVersion = "0.2.6.0"
+var appVersion = "0.2.6.1"
 
 var httpClient = &http.Client{Timeout: 30 * time.Second, CheckRedirect: func(r *http.Request, via []*http.Request) error {
 	if len(via) > 8 || r.URL.Scheme != "https" {

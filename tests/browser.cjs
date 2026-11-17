@@ -164,6 +164,36 @@ async function run() {
           auditedFields++;
         }
       }
+      // Hybrid parents must be explicit at creation, persist through the updater-compatible
+      // local roster/save format, and be visible on the offline Play sheet.
+      const hybridResults = await page.evaluate(() => {
+        state.creation.character = newCharacterDraft();
+        const d = state.creation.character;
+        d.name = 'Hybrid Test'; d.concept = 'Parent Ability regression';
+        d.tags = ['Brave', 'Inventive', 'Steady'];
+        for(const [ability,dots] of Object.entries({Athletics:2,Melee:1,Firearms:1,Piloting:1,Investigation:1,Medicine:1,Leadership:1,Presence:1}))d.dots[ability]=dots;
+        const missing = characterDraftErrors().filter(x=>x.includes('parent Ability'));
+        const parents = {Leadership:'Investigation', Performance:'Presence', Crafting:'Technology', Streetwise:'Security', Influence:'Empathy', Nature:'Survival'};
+        for(const [ability,parent] of Object.entries(parents))setHybridParent(ability,parent);
+        const errorsBeforeFinalize = characterDraftErrors();
+        const allocation = {Body:draftBudgetUsed(d,'Body'),Mind:draftBudgetUsed(d,'Mind'),Spirit:draftBudgetUsed(d,'Spirit')};
+        const selected = document.querySelector('select[aria-label="Leadership parent ability"]')?.value;
+        if(errorsBeforeFinalize.length===0)finalizeCharacterDraft(false);
+        return {missingCount:missing.length,errorsBeforeFinalize,allocation,selected,receipt:structuredClone(state.character.buildReceipt||{}),note:document.getElementById('abilities')?.textContent||'',ready:studioReadyForPlay()};
+      });
+      assert.equal(hybridResults.missingCount, 6, 'All six Hybrid parents require deliberate choices');
+      assert.deepEqual(hybridResults.errorsBeforeFinalize, [], 'Completed parent choices should pass starting validation');
+      assert.deepEqual(hybridResults.allocation, {Body:5,Mind:3,Spirit:1});
+      assert.equal(hybridResults.selected,'Investigation');
+      assert.equal(hybridResults.receipt.hybridParent.Leadership,'Investigation');
+      assert.equal(hybridResults.ready,true);
+      assert.match(hybridResults.note,/Parent: Investigation/);
+      const selectedRollStat = await page.evaluate(() => { openRoll('Leadership','Hybrid');const s=rollStat.value;closeRoll();return s; });
+      assert.equal(selectedRollStat,'Mind','Hybrid rolls use the selected parent Core Stat');
+      await page.reload();
+      assert.equal(await page.evaluate(() => state.character.buildReceipt.hybridParent.Leadership),'Investigation');
+      assert.match(await page.locator('.paper-ability-group').last().innerText(),/Parent: Investigation/);
+      assert.deepEqual(await page.evaluate(() => studioBuildIssues(state.character)),[],'Saved complete character stays ready');
       assert.deepEqual(errors, [], 'No browser exceptions');
       results.push({ profile: profile.name, passed: true, viewport: profile.viewport, auditedFields, checks: ['continuous typing', 'stable node identity', 'caret insertion', 'textarea typing', 'dropdown scroll', 'composition', 'save and reload', 'import preview', 'player state preservation', 'search', 'selection and collection', 'file export/import', 'conflict choice', 'local backup', 'exact restore', 'storage failure rollback', 'main importer pack routing', 'imported scene editing', 'all builder suites', 'mobile layout', 'no runtime errors'] });
       console.log(profile.name + ': all browser checks passed');

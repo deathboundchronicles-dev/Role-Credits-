@@ -1,6 +1,6 @@
 # Role Credits Studio
 
-Offline character, campaign, and homebrew tools for Windows, Android, and a standalone HTML file. The current release is **[v0.2.6.0](https://github.com/deathboundchronicles-dev/Role-Credits-/releases/tag/v0.2.6.0)**. Never replace existing v0.2.5.0 release assets.
+Offline character, campaign, and homebrew tools for Windows, Android, and a standalone HTML file. The next release is **v0.2.6.1**, combining the Hybrid parent Ability requirement and offline Scene, Threat, HP, initiative, and first-Mission companion controls. The currently published release is **[v0.2.6.0](https://github.com/deathboundchronicles-dev/Role-Credits-/releases/tag/v0.2.6.0)**. Never replace existing v0.2.5.0 release assets.
 
 ## One shared app
 

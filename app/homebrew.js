@@ -164,7 +164,7 @@
       }
     }
     const items = all.filter(item => chosen.has(key(item)));
-    return { format: FORMAT, schemaVersion: VERSION, appVersion: options.appVersion || "0.2.6.0", kind: options.backup ? "backup" : "pack",
+    return { format: FORMAT, schemaVersion: VERSION, appVersion: options.appVersion || "0.2.6.1", kind: options.backup ? "backup" : "pack",
       name: options.name || "Homebrew Library", exportedAt: new Date().toISOString(), items,
       collections: clone(library.collections || []).map(collection => ({ ...collection, members: collection.members.filter(member => chosen.has(member.type + ":" + member.id)) })).filter(collection => collection.members.length) };
   }
