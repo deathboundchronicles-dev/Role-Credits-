@@ -1,0 +1,55 @@
+name: Apply Role Credits Unified 0.2.6.1
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11.25.0'
+      - name: Download and verify unified patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://drive.google.com/uc?export=download&id=1QYvMxtgEBAZ2OYQ3hjTtcuSIUITV3u20' -o /tmp/rc-update.zip
+          test "$(stat -c%s /tmp/rc-update.zip)" -gt 20000
+          unzip -t /tmp/rc-update.zip
+          mkdir -p /tmp/rc-update
+          unzip -q /tmp/rc-update.zip -d /tmp/rc-update
+          test -s /tmp/rc-update/apply_role_credits_unified.mjs
+      - name: Apply source patch and verify release consistency
+        run: |
+          node /tmp/rc-update/apply_role_credits_unified.mjs "$GITHUB_WORKSPACE"
+          node /tmp/rc-update/apply_role_credits_unified.mjs "$GITHUB_WORKSPACE" --verify-only
+          node scripts/sync-app.mjs --check
+          python3 release/check_release.py 0.2.6.1
+      - name: Run regression suite
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm test
+          pnpm exec playwright install --with-deps chromium
+          pnpm test:browser
+      - name: Commit only tested update files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(cat release/VERSION)" = "0.2.6.1"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html Role_Credits_Studio_Standalone.html android/app/src/main/assets/index.html main.go release/VERSION release/RELEASE_NOTES.md README.md package.json tests/browser.cjs tests/companion-browser.cjs
+          git commit -m "Release 0.2.6.1: hybrid parents and offline companion"
+          git push origin HEAD:main
+      - name: Trigger coordinated signed Windows and Android release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run cross-platform-release.yml --ref main -f version=0.2.6.1 -f channel=prerelease
